@@ -15,20 +15,6 @@ struct Element{
     unsigned int node[Nne]; //global node numbers of the element
 };
 
-struct ProblemData {
-    double Kl, rho, Cl, alpha, LatentHeat;
-    double T0, T1, Tm, h, fint;
-    double L, x1_ll, x1_ul;
-    unsigned int Nt, Nel_t, quadRule;
-    double dx1, he, Jac, Jac_inv;
-    std::vector<Node> nodes;
-    std::vector<Element<2>> elements;
-    std::vector<double> qpoints, qweights;
-    double alpha_t, dt;
-};
-
-ProblemData pd;
-
 double xi_at_node(unsigned int node){ //function to return xi1 and xi2 for given node A
         double xi;
         switch(node){
@@ -142,153 +128,6 @@ void writeArrayToOutFile(const std::string& filename, const Eigen::VectorXd& vec
     }
 }
 
-Eigen::VectorXd SolveHeatEqn(unsigned int Nt_active){
-    unsigned int Nt = Nt_active;
-    unsigned int Nel_t = Nt_active - 1;
-    //Heat equation solving starts
-    Eigen::MatrixXd Kglobal = Eigen::MatrixXd::Zero(Nt, Nt); //global stiffness matrix
-    Eigen::MatrixXd Mglobal = Eigen::MatrixXd::Zero(Nt, Nt); //global mass matrix
-    Eigen::VectorXd Fglobal = Eigen::VectorXd::Zero(Nt); //global force vector
-
-    //Global node locations having Neumann Boundary conditions specified on them
-    std::vector<unsigned int> nodeLocationsN;
-    for(int i = 0; i < Nt; i++){
-        if(nodes[i].x1 == x1_ul){
-            nodeLocationsN.push_back(i);
-        }
-    }
-    std::vector<bool> isNeumann(Nt,false);
-    for(unsigned int& nodeLocation : nodeLocationsN){
-        isNeumann[nodeLocation] = true;
-    }
-
-    std::vector<unsigned int> nodeLocationsD; //knowns (dirichlet node locations)
-    nodeLocationsD.push_back(0); //dirischlet boundary at x = 0
-    nodeLocationsD.push_back(Nt_active - 1); //dirischlet boundary at x = s (interface position)
-
-    std::vector<bool> isDirischlet(Nt,false);
-    for(unsigned int& nodeLocation : nodeLocationsD){
-        isDirischlet[nodeLocation] = true;
-    }
-
-    Eigen::VectorXd dirischletVal(nodeLocationsD.size());
-    dirischletVal[0] = T1; //high temperature BC at the left boundary
-    dirischletVal[1] = Tm; //melt temperature BC at the interface
-
-    Eigen::VectorXd dirischletValDot = Eigen::VectorXd::Zero(nodeLocationsD.size()); //rate of change of temperature on the dirischlet boundary
-
-    //assembly
-    for(unsigned int e = 0 ; e < Nel_t ; e++){
-        Eigen::MatrixXd Klocal = Eigen::MatrixXd::Zero(Nne, Nne); //local stiffness matrix
-        Eigen::MatrixXd Mlocal = Eigen::MatrixXd::Zero(Nne, Nne); //local mass matrix
-        Eigen::VectorXd Flocal_int = Eigen::VectorXd::Zero(Nne); //local force vector
-        Eigen::VectorXd Flocal_h = Eigen::VectorXd::Zero(Nne); //local force vector for neumann boundary condition
-
-        for(unsigned int A = 0 ; A < Nne ; A++){
-            for(unsigned int B = 0 ; B < Nne ; B++){
-                for(unsigned int I = 0 ; I < quadRule ; I++){
-                    double xi = points[I];
-                    double w = weights[I];
-
-                    double bfgradientA_xi = basis_gradient(A, xi);
-                    double bfgradientB_xi = basis_gradient(B, xi);
-
-                    double Kvalue = bfgradientA_xi * Kl * bfgradientB_xi * Jac_inv * w;
-                    Klocal(A,B) += Kvalue;
-
-                    double Mvalue = basis_function(A, xi) * rho * Cl * basis_function(B, xi) * Jac * w;
-                    Mlocal(A,B) += Mvalue;
-                }
-            }
-            for(unsigned int I = 0 ; I < quadRule ; I++){
-                double xi = points[I];
-                double w = weights[I];
-
-                double bfA = basis_function(A, xi);
-
-                Flocal_int(A) += bfA * fint * Jac * w; //contribution to the local force vector from the initial condition
-            }
-            if(isNeumann[elements[e].node[A]]){
-                Flocal_h(A) += basis_function(A, 1.0) * h * he/2.0; //contribution to the local force vector from the neumann boundary condition
-            }
-        }
-
-        //assemble local contributions into global matrices and vector
-        for(int A = 0 ; A < Nne ; A++){
-            int Aglobal = elements[e].node[A];
-            for(int B = 0 ; B < Nne ; B++){
-                int Bglobal = elements[e].node[B];
-                Kglobal(Aglobal,Bglobal) += Klocal(A,B);
-                Mglobal(Aglobal,Bglobal) += Mlocal(A,B);
-            }
-            Fglobal(Aglobal) += Flocal_int(A) - Flocal_h(A); //this now contains contribution from neumann boundary condition as well
-        }
-    }
-
-    //Applying Dirischlet Boundary Conditions
-    std::vector<unsigned int> nodeLocationsU; //unknown node locations - node locations where fleid value is unknown
-    for(int i = 0 ; i < Nt ; i++){
-        if(!isDirischlet[i]){
-            nodeLocationsU.push_back(i);
-        }
-    }
-
-    Eigen::MatrixXd KUU = extractSubmatrix(Kglobal, nodeLocationsU, nodeLocationsU); //extract from Kglobal - only rows and columns pertaining to unknown node locations
-    Eigen::MatrixXd KUD = extractSubmatrix(Kglobal, nodeLocationsU, nodeLocationsD); //extract from Kglobal - only columns corresponding to Dirischlet node locations, for rows corresponding to unknown node locations
-
-    Eigen::MatrixXd MUU = extractSubmatrix(Mglobal, nodeLocationsU, nodeLocationsU); //extract from Mglobal - only rows and columns pertaining to unknown node locations
-    Eigen::MatrixXd MUD = extractSubmatrix(Mglobal, nodeLocationsU, nodeLocationsD); //extract from Mglobal - only columns corresponding to Dirischlet node locations, for rows corresponding to unknown node locations
-
-    Eigen::VectorXd FU(nodeLocationsU.size()); //extract from Fglobal - only rows corresponding to unknown node locations
-    for(int i = 0; i < nodeLocationsU.size(); i++){
-        FU(i) = Fglobal(nodeLocationsU[i]);
-    }
-    
-    Eigen::VectorXd F(FU.size()); //create final forcing function vector
-    F = FU - KUD*dirischletVal - MUD*dirischletValDot;
-    
-    //initial condition
-    Eigen::VectorXd D0 = Eigen::VectorXd::Zero(Nt);
-    Eigen::VectorXd V0 = Eigen::VectorXd::Zero(Nt);
-    for(int i = 0 ; i < Nt ; i++){
-        D0(i) = T0; //initial temperature at all nodes is T0
-    }
-
-    Eigen::VectorXd Dn(nodeLocationsU.size());
-    Eigen::VectorXd Vn(nodeLocationsU.size());
-    for(int i = 0; i < nodeLocationsU.size() ; i++){
-        Dn(i) = D0(nodeLocationsU[i]);
-    }
-
-    Eigen::LDLT<Eigen::MatrixXd> solver1(MUU);
-    Vn = solver1.solve(F - KUU*Dn); //find V0 to initiate the time stepping process
-    // cout << Vn << endl;
-    Eigen::MatrixXd lhs = MUU + alpha_t*dt*KUU;
-    Eigen::LDLT<Eigen::MatrixXd> solver(lhs);
-
-    //Final solution stored in D
-    Eigen::VectorXd D = Eigen::VectorXd::Zero(Nt);
-
-    Eigen::VectorXd predictor = Dn + dt*(1 - alpha_t)*Vn;
-    Eigen::VectorXd rhs = alpha_t*dt*F + MUU*predictor;
-
-    Eigen::VectorXd Dnp1 = solver.solve(rhs);
-
-    Dn = Dnp1;
-    Vn = (Dnp1 - predictor)/(alpha_t*dt);
-
-        // apply boundary conditions to obtain final solution
-    for(int i = 0 ; i < nodeLocationsD.size() ; i++){
-        int indexD = nodeLocationsD[i];
-        D[indexD] = dirischletVal[i];
-    }
-    for(int i = 0 ; i < nodeLocationsU.size() ; i++){
-        int indexD = nodeLocationsU[i];
-        D[indexD] = Dn[i];
-    }
-
-    return D;
-}
 
 int main(){
     unsigned int Nd = 1; //1D problem
@@ -298,6 +137,7 @@ int main(){
     //problem variables
     double T0 = 0.0; //initial temperature
     double T1 = 25.0; //boundary temperature at x=0
+    double Tm = 0.0; //melt temperature of the phase change material
     double h = 0.0; //neumann boundary
     double fint = 0.0; //internal forcing function
 
@@ -360,17 +200,168 @@ int main(){
 
     //initialize the interface just after the leftmost node
     double s = he;
+    std::vector<double> interface_locs;
+    interface_locs.push_back(s);
 
     //time integration using backward Euler method
     double alpha_t = 1.0; //weighting parameter for time integration scheme - 1.0 for backward Euler
-    double dt = 1.0; //time step size
-    unsigned int NT = 100; //number of time steps
+    double dt = 10.0; //time step size
+    unsigned int NT = 1000; //number of time steps
+
+    auto SolveHeatEqn = [&](unsigned int Nt_active) -> Eigen::VectorXd {
+        unsigned int Nt = Nt_active;
+        unsigned int Nel_t = Nt_active - 1;
+        //Heat equation solving starts
+        Eigen::MatrixXd Kglobal = Eigen::MatrixXd::Zero(Nt, Nt); //global stiffness matrix
+        Eigen::MatrixXd Mglobal = Eigen::MatrixXd::Zero(Nt, Nt); //global mass matrix
+        Eigen::VectorXd Fglobal = Eigen::VectorXd::Zero(Nt); //global force vector
+
+        //Global node locations having Neumann Boundary conditions specified on them
+        std::vector<unsigned int> nodeLocationsN;
+        for(int i = 0; i < Nt; i++){
+            if(nodes[i].x1 == x1_ul){
+                nodeLocationsN.push_back(i);
+            }
+        }
+        std::vector<bool> isNeumann(Nt,false);
+        for(unsigned int& nodeLocation : nodeLocationsN){
+            isNeumann[nodeLocation] = true;
+        }
+
+        std::vector<unsigned int> nodeLocationsD; //knowns (dirichlet node locations)
+        nodeLocationsD.push_back(0); //dirischlet boundary at x = 0
+        nodeLocationsD.push_back(Nt_active - 1); //dirischlet boundary at x = s (interface position)
+
+        std::vector<bool> isDirischlet(Nt,false);
+        for(unsigned int& nodeLocation : nodeLocationsD){
+            isDirischlet[nodeLocation] = true;
+        }
+
+        Eigen::VectorXd dirischletVal(nodeLocationsD.size());
+        dirischletVal[0] = T1; //high temperature BC at the left boundary
+        dirischletVal[1] = Tm; //melt temperature BC at the interface
+
+        Eigen::VectorXd dirischletValDot = Eigen::VectorXd::Zero(nodeLocationsD.size()); //rate of change of temperature on the dirischlet boundary
+
+        //assembly
+        for(unsigned int e = 0 ; e < Nel_t ; e++){
+            Eigen::MatrixXd Klocal = Eigen::MatrixXd::Zero(Nne, Nne); //local stiffness matrix
+            Eigen::MatrixXd Mlocal = Eigen::MatrixXd::Zero(Nne, Nne); //local mass matrix
+            Eigen::VectorXd Flocal_int = Eigen::VectorXd::Zero(Nne); //local force vector
+            Eigen::VectorXd Flocal_h = Eigen::VectorXd::Zero(Nne); //local force vector for neumann boundary condition
+
+            for(unsigned int A = 0 ; A < Nne ; A++){
+                for(unsigned int B = 0 ; B < Nne ; B++){
+                    for(unsigned int I = 0 ; I < quadRule ; I++){
+                        double xi = points[I];
+                        double w = weights[I];
+
+                        double bfgradientA_xi = basis_gradient(A, xi);
+                        double bfgradientB_xi = basis_gradient(B, xi);
+
+                        double Kvalue = bfgradientA_xi * Kl * bfgradientB_xi * Jac_inv * w;
+                        Klocal(A,B) += Kvalue;
+
+                        double Mvalue = basis_function(A, xi) * rho * Cl * basis_function(B, xi) * Jac * w;
+                        Mlocal(A,B) += Mvalue;
+                    }
+                }
+                for(unsigned int I = 0 ; I < quadRule ; I++){
+                    double xi = points[I];
+                    double w = weights[I];
+
+                    double bfA = basis_function(A, xi);
+
+                    Flocal_int(A) += bfA * fint * Jac * w; //contribution to the local force vector from the initial condition
+                }
+                if(isNeumann[elements[e].node[A]]){
+                    Flocal_h(A) += basis_function(A, 1.0) * h * he/2.0; //contribution to the local force vector from the neumann boundary condition
+                }
+            }
+
+            //assemble local contributions into global matrices and vector
+            for(int A = 0 ; A < Nne ; A++){
+                int Aglobal = elements[e].node[A];
+                for(int B = 0 ; B < Nne ; B++){
+                    int Bglobal = elements[e].node[B];
+                    Kglobal(Aglobal,Bglobal) += Klocal(A,B);
+                    Mglobal(Aglobal,Bglobal) += Mlocal(A,B);
+                }
+                Fglobal(Aglobal) += Flocal_int(A) - Flocal_h(A); //this now contains contribution from neumann boundary condition as well
+            }
+        }
+
+        //Applying Dirischlet Boundary Conditions
+        std::vector<unsigned int> nodeLocationsU; //unknown node locations - node locations where fleid value is unknown
+        for(int i = 0 ; i < Nt ; i++){
+            if(!isDirischlet[i]){
+                nodeLocationsU.push_back(i);
+            }
+        }
+
+        Eigen::MatrixXd KUU = extractSubmatrix(Kglobal, nodeLocationsU, nodeLocationsU); //extract from Kglobal - only rows and columns pertaining to unknown node locations
+        Eigen::MatrixXd KUD = extractSubmatrix(Kglobal, nodeLocationsU, nodeLocationsD); //extract from Kglobal - only columns corresponding to Dirischlet node locations, for rows corresponding to unknown node locations
+
+        Eigen::MatrixXd MUU = extractSubmatrix(Mglobal, nodeLocationsU, nodeLocationsU); //extract from Mglobal - only rows and columns pertaining to unknown node locations
+        Eigen::MatrixXd MUD = extractSubmatrix(Mglobal, nodeLocationsU, nodeLocationsD); //extract from Mglobal - only columns corresponding to Dirischlet node locations, for rows corresponding to unknown node locations
+
+        Eigen::VectorXd FU(nodeLocationsU.size()); //extract from Fglobal - only rows corresponding to unknown node locations
+        for(int i = 0; i < nodeLocationsU.size(); i++){
+            FU(i) = Fglobal(nodeLocationsU[i]);
+        }
+        
+        Eigen::VectorXd F(FU.size()); //create final forcing function vector
+        F = FU - KUD*dirischletVal - MUD*dirischletValDot;
+        
+        //initial condition
+        Eigen::VectorXd D0 = Eigen::VectorXd::Zero(Nt);
+        Eigen::VectorXd V0 = Eigen::VectorXd::Zero(Nt);
+        for(int i = 0 ; i < Nt ; i++){
+            D0(i) = T0; //initial temperature at all nodes is T0
+        }
+
+        Eigen::VectorXd Dn(nodeLocationsU.size());
+        Eigen::VectorXd Vn(nodeLocationsU.size());
+        for(int i = 0; i < nodeLocationsU.size() ; i++){
+            Dn(i) = D0(nodeLocationsU[i]);
+        }
+
+        Eigen::LDLT<Eigen::MatrixXd> solver1(MUU);
+        Vn = solver1.solve(F - KUU*Dn); //find V0 to initiate the time stepping process
+        // cout << Vn << endl;
+        Eigen::MatrixXd lhs = MUU + alpha_t*dt*KUU;
+        Eigen::LDLT<Eigen::MatrixXd> solver(lhs);
+
+        //Final solution stored in D
+        Eigen::VectorXd D = Eigen::VectorXd::Zero(Nt);
+
+        Eigen::VectorXd predictor = Dn + dt*(1 - alpha_t)*Vn;
+        Eigen::VectorXd rhs = alpha_t*dt*F + MUU*predictor;
+
+        Eigen::VectorXd Dnp1 = solver.solve(rhs);
+
+        Dn = Dnp1;
+        Vn = (Dnp1 - predictor)/(alpha_t*dt);
+
+            // apply boundary conditions to obtain final solution
+        for(int i = 0 ; i < nodeLocationsD.size() ; i++){
+            int indexD = nodeLocationsD[i];
+            D[indexD] = dirischletVal[i];
+        }
+        for(int i = 0 ; i < nodeLocationsU.size() ; i++){
+            int indexD = nodeLocationsU[i];
+            D[indexD] = Dn[i];
+        }
+
+        return D;
+    };
+
 
     Eigen::VectorXd D_full = Eigen::VectorXd::Zero(Nt);
 
     for(unsigned int n = 0 ; n < NT ; n++){
         
-        unsigned int InterfaceNode = static_cast<int>(s/he) + 1;
+        unsigned int InterfaceNode = static_cast<int>(s/he);
         unsigned int Nt_active = InterfaceNode + 1;//active number of nodes for solving heat equation
 
         Eigen::VectorXd D_active = SolveHeatEqn(Nt_active);
@@ -381,10 +372,17 @@ int main(){
         std::string filename = "solutions/solution_t_" + std::to_string(n) + ".out";
         writeArrayToOutFile(filename, D_full, Nt);
 
-        double dTdx = (D_full(InterfaceNode) - D_full(InterfaceNode - 1))/he;
+        double dTdx = (D_active(InterfaceNode) - D_full(InterfaceNode - 1))/he;
         double InterfaceSpeed = -1*(Kl/(rho*LatentHeat))*dTdx;
 
         s += InterfaceSpeed*dt;
+        interface_locs.push_back(s);
+    }
+
+    //write interface locations to file
+    std::ofstream interface_locs_file("solutions/interface_locs.out");
+    for(auto& sloc : interface_locs){
+        interface_locs_file << sloc << "\n";
     }
 
 }
