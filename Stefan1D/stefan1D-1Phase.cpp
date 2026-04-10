@@ -144,6 +144,8 @@ int main(){
     double Cl = 4186.8; //specific heat capacity of the liquid phase
     double alpha = Kl/(rho*Cl); //thermal diffusivity of the liquid phase
 
+    double LatentHeat = 333400.0; //latent heat of fusion for the phase change material
+
     //domain
     double L = 0.01; //length of the domain
     double x1_ll = 0.0; //left boundary of the domain
