@@ -15,6 +15,20 @@ struct Element{
     unsigned int node[Nne]; //global node numbers of the element
 };
 
+struct ProblemData {
+    double Kl, rho, Cl, alpha, LatentHeat;
+    double T0, T1, Tm, h, fint;
+    double L, x1_ll, x1_ul;
+    unsigned int Nt, Nel_t, quadRule;
+    double dx1, he, Jac, Jac_inv;
+    std::vector<Node> nodes;
+    std::vector<Element<2>> elements;
+    std::vector<double> qpoints, qweights;
+    double alpha_t, dt;
+};
+
+ProblemData pd;
+
 double xi_at_node(unsigned int node){ //function to return xi1 and xi2 for given node A
         double xi;
         switch(node){
@@ -128,69 +142,10 @@ void writeArrayToOutFile(const std::string& filename, const Eigen::VectorXd& vec
     }
 }
 
-int main(){
-    unsigned int Nd = 1; //1D problem
-    constexpr int Nne = 2; //number of nodes per element
-    unsigned int quadRule = 2; //number of quadrature points per element
-    
-    //problem variables
-    double T0 = 0.0; //initial temperature
-    double T1 = 25.0; //boundary temperature at x=0
-    double h = 0.0; //neumann boundary
-    double fint = 0.0; //internal forcing function
-
-    double Kl = 0.564; //thermal conductivity of the liquid phase
-    double rho = 1000.0; //density of the liquid phase
-    double Cl = 4186.8; //specific heat capacity of the liquid phase
-    double alpha = Kl/(rho*Cl); //thermal diffusivity of the liquid phase
-
-    double LatentHeat = 333400.0; //latent heat of fusion for the phase change material
-
-    //domain
-    double L = 0.01; //length of the domain
-    double x1_ll = 0.0; //left boundary of the domain
-    double x1_ul = L; //right boundary of the domain
-
-    //create mesh
-    unsigned int Nt = 100; //total number of nodes in the mesh
-    double dx1 = (x1_ul - x1_ll)/(Nt-1); //spacing between nodes
-    unsigned int Nel_t = Nt - 1; //total number of elements in the mesh
-
-    //global node locations
-    std::vector<Node> nodes;
-    nodes.reserve(Nt);
-    for(unsigned int i=0; i<Nt; ++i){
-        Node n;
-        n.x1 = x1_ll + i*dx1;
-        nodes.push_back(n);
-    }
-
-    using Element1D = Element<Nne>;
-    std::vector<Element1D> elements;
-    elements.reserve(Nel_t);
-    for(unsigned int i=0; i<Nel_t; ++i){
-        Element1D e;
-        e.node[0] = i; //global node number of the first node of the element
-        e.node[1] = i+1; //global node number of the second node of the element
-        elements.push_back(e);
-    }
-
-    std::ofstream points_file("points.txt");
-    for(auto& node : nodes){
-        points_file << node.x1 << "\n";
-    }
-
-    std::ofstream linears_file("linears.txt");
-    for(auto& elem : elements){
-        linears_file << elem.node[0] << " " << elem.node[1] << "\n";
-    }
-
-    //Quadrature rule
-    QuadratureRule q = gauss_legendre(quadRule);
-    std::vector<double> points(quadRule), weights(quadRule);
-    points = q.points;
-    weights = q.weights;
-
+Eigen::VectorXd SolveHeatEqn(unsigned int Nt_active){
+    unsigned int Nt = Nt_active;
+    unsigned int Nel_t = Nt_active - 1;
+    //Heat equation solving starts
     Eigen::MatrixXd Kglobal = Eigen::MatrixXd::Zero(Nt, Nt); //global stiffness matrix
     Eigen::MatrixXd Mglobal = Eigen::MatrixXd::Zero(Nt, Nt); //global mass matrix
     Eigen::VectorXd Fglobal = Eigen::VectorXd::Zero(Nt); //global force vector
@@ -208,29 +163,19 @@ int main(){
     }
 
     std::vector<unsigned int> nodeLocationsD; //knowns (dirichlet node locations)
-    for(int i = 0 ; i < Nt ; i++){
-        if(nodes[i].x1== x1_ll){ //dirichlet boundary at x = 0
-            nodeLocationsD.push_back(i);
-        }
-    }
+    nodeLocationsD.push_back(0); //dirischlet boundary at x = 0
+    nodeLocationsD.push_back(Nt_active - 1); //dirischlet boundary at x = s (interface position)
+
     std::vector<bool> isDirischlet(Nt,false);
     for(unsigned int& nodeLocation : nodeLocationsD){
         isDirischlet[nodeLocation] = true;
     }
 
     Eigen::VectorXd dirischletVal(nodeLocationsD.size());
-    for(unsigned int i = 0 ; i < nodeLocationsD.size() ; i++){
-        int nodeD = nodeLocationsD[i];
-        if(nodes[nodeD].x1 == x1_ll){
-            dirischletVal[i] = T1;
-        }
-    }
+    dirischletVal[0] = T1; //high temperature BC at the left boundary
+    dirischletVal[1] = Tm; //melt temperature BC at the interface
+
     Eigen::VectorXd dirischletValDot = Eigen::VectorXd::Zero(nodeLocationsD.size()); //rate of change of temperature on the dirischlet boundary
-
-    double he = nodes[1].x1 - nodes[0].x1;//node spacing in x1 direction : to be used for computation of neumann boundary condition term
-
-    double Jac = he/2.0; //Jacobian of the transformation from reference element to physical element
-    double Jac_inv = 1.0/Jac;
 
     //assembly
     for(unsigned int e = 0 ; e < Nel_t ; e++){
@@ -301,11 +246,6 @@ int main(){
     
     Eigen::VectorXd F(FU.size()); //create final forcing function vector
     F = FU - KUD*dirischletVal - MUD*dirischletValDot;
-
-    //time integration using backward Euler method
-    double alpha_t = 1.0; //weighting parameter for time integration scheme - 1.0 for backward Euler
-    double dt = 1.0; //time step size
-    unsigned int NT = 1000; //number of time steps
     
     //initial condition
     Eigen::VectorXd D0 = Eigen::VectorXd::Zero(Nt);
@@ -329,27 +269,122 @@ int main(){
     //Final solution stored in D
     Eigen::VectorXd D = Eigen::VectorXd::Zero(Nt);
 
+    Eigen::VectorXd predictor = Dn + dt*(1 - alpha_t)*Vn;
+    Eigen::VectorXd rhs = alpha_t*dt*F + MUU*predictor;
+
+    Eigen::VectorXd Dnp1 = solver.solve(rhs);
+
+    Dn = Dnp1;
+    Vn = (Dnp1 - predictor)/(alpha_t*dt);
+
+        // apply boundary conditions to obtain final solution
+    for(int i = 0 ; i < nodeLocationsD.size() ; i++){
+        int indexD = nodeLocationsD[i];
+        D[indexD] = dirischletVal[i];
+    }
+    for(int i = 0 ; i < nodeLocationsU.size() ; i++){
+        int indexD = nodeLocationsU[i];
+        D[indexD] = Dn[i];
+    }
+
+    return D;
+}
+
+int main(){
+    unsigned int Nd = 1; //1D problem
+    constexpr int Nne = 2; //number of nodes per element
+    unsigned int quadRule = 2; //number of quadrature points per element
+    
+    //problem variables
+    double T0 = 0.0; //initial temperature
+    double T1 = 25.0; //boundary temperature at x=0
+    double h = 0.0; //neumann boundary
+    double fint = 0.0; //internal forcing function
+
+    double Kl = 0.564; //thermal conductivity of the liquid phase
+    double rho = 1000.0; //density of the liquid phase
+    double Cl = 4186.8; //specific heat capacity of the liquid phase
+    double alpha = Kl/(rho*Cl); //thermal diffusivity of the liquid phase
+
+    double LatentHeat = 333400.0; //latent heat of fusion for the phase change material
+
+    //domain
+    double L = 0.01; //length of the domain
+    double x1_ll = 0.0; //left boundary of the domain
+    double x1_ul = L; //right boundary of the domain
+
+    //create mesh
+    unsigned int Nt = 100; //total number of nodes in the mesh
+    double dx1 = (x1_ul - x1_ll)/(Nt-1); //spacing between nodes
+    unsigned int Nel_t = Nt - 1; //total number of elements in the mesh
+
+    //global node locations
+    std::vector<Node> nodes;
+    nodes.reserve(Nt);
+    for(unsigned int i=0; i<Nt; ++i){
+        Node n;
+        n.x1 = x1_ll + i*dx1;
+        nodes.push_back(n);
+    }
+
+    using Element1D = Element<Nne>;
+    std::vector<Element1D> elements;
+    elements.reserve(Nel_t);
+    for(unsigned int i=0; i<Nel_t; ++i){
+        Element1D e;
+        e.node[0] = i; //global node number of the first node of the element
+        e.node[1] = i+1; //global node number of the second node of the element
+        elements.push_back(e);
+    }
+
+    std::ofstream points_file("points.txt");
+    for(auto& node : nodes){
+        points_file << node.x1 << "\n";
+    }
+
+    std::ofstream linears_file("linears.txt");
+    for(auto& elem : elements){
+        linears_file << elem.node[0] << " " << elem.node[1] << "\n";
+    }
+
+    //Quadrature rule
+    QuadratureRule q = gauss_legendre(quadRule);
+    std::vector<double> points(quadRule), weights(quadRule);
+    points = q.points;
+    weights = q.weights;
+
+    double he = nodes[1].x1 - nodes[0].x1;//node spacing in x1 direction : to be used for computation of neumann boundary condition term
+
+    double Jac = he/2.0; //Jacobian of the transformation from reference element to physical element
+    double Jac_inv = 1.0/Jac;
+
+    //initialize the interface just after the leftmost node
+    double s = he;
+
+    //time integration using backward Euler method
+    double alpha_t = 1.0; //weighting parameter for time integration scheme - 1.0 for backward Euler
+    double dt = 1.0; //time step size
+    unsigned int NT = 100; //number of time steps
+
+    Eigen::VectorXd D_full = Eigen::VectorXd::Zero(Nt);
+
     for(unsigned int n = 0 ; n < NT ; n++){
-        Eigen::VectorXd predictor = Dn + dt*(1 - alpha_t)*Vn;
-        Eigen::VectorXd rhs = alpha_t*dt*F + MUU*predictor;
+        
+        unsigned int InterfaceNode = static_cast<int>(s/he) + 1;
+        unsigned int Nt_active = InterfaceNode + 1;//active number of nodes for solving heat equation
 
-        Eigen::VectorXd Dnp1 = solver.solve(rhs);
+        Eigen::VectorXd D_active = SolveHeatEqn(Nt_active);
 
-        Dn = Dnp1;
-        Vn = (Dnp1 - predictor)/(alpha_t*dt);
-
-         // apply boundary conditions to obtain final solution
-        for(int i = 0 ; i < nodeLocationsD.size() ; i++){
-            int indexD = nodeLocationsD[i];
-            D[indexD] = dirischletVal[i];
-        }
-        for(int i = 0 ; i < nodeLocationsU.size() ; i++){
-            int indexD = nodeLocationsU[i];
-            D[indexD] = Dn[i];
-        }
+        D_full.head(Nt_active) = D_active;
+        D_full.tail(Nt - Nt_active).setConstant(T0);
 
         std::string filename = "solutions/solution_t_" + std::to_string(n) + ".out";
-        writeArrayToOutFile(filename, D, Nt);
+        writeArrayToOutFile(filename, D_full, Nt);
+
+        double dTdx = (D_full(InterfaceNode) - D_full(InterfaceNode - 1))/he;
+        double InterfaceSpeed = -1*(Kl/(rho*LatentHeat))*dTdx;
+
+        s += InterfaceSpeed*dt;
     }
 
 }
