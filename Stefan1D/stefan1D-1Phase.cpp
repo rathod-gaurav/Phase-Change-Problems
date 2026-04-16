@@ -141,12 +141,12 @@ int main(){
     double h = 0.0; //neumann boundary
     double fint = 0.0; //internal forcing function
 
-    double Kl = 0.564; //thermal conductivity of the liquid phase
+    double Kl = 0.2; //thermal conductivity of the liquid phase : 0.564 W/m-K for water at room temperature
     double rho = 1000.0; //density of the liquid phase
-    double Cl = 4186.8; //specific heat capacity of the liquid phase
+    double Cl = 586.8; //specific heat capacity of the liquid phase : 4186.8 J/kg-K for water at room temperature
     double alpha = Kl/(rho*Cl); //thermal diffusivity of the liquid phase
 
-    double LatentHeat = 333400.0; //latent heat of fusion for the phase change material
+    double LatentHeat = 323400.0; //latent heat of fusion for the phase change material : 333400 J/kg for water
 
     //domain
     double L = 0.01; //length of the domain
@@ -206,7 +206,7 @@ int main(){
     //time integration using backward Euler method
     double alpha_t = 1.0; //weighting parameter for time integration scheme - 1.0 for backward Euler
     double dt = 10.0; //time step size
-    unsigned int NT = 1000; //number of time steps
+    unsigned int NT = 3000; //number of time steps
 
     auto SolveHeatEqn = [&](unsigned int Nt_active) -> Eigen::VectorXd {
         unsigned int Nt = Nt_active;
@@ -360,23 +360,31 @@ int main(){
     Eigen::VectorXd D_full = Eigen::VectorXd::Zero(Nt);
 
     for(unsigned int n = 0 ; n < NT ; n++){
-        
-        unsigned int InterfaceNode = static_cast<int>(s/he);
-        unsigned int Nt_active = InterfaceNode + 1;//active number of nodes for solving heat equation
+        if(s>=L){
+            unsigned int Nt_active = Nt;
+            Eigen::VectorXd D_active = SolveHeatEqn(Nt_active);
+            D_full = D_active;
+            std::string filename = "solutions/solution_t_" + std::to_string(n) + ".out";
+            writeArrayToOutFile(filename, D_full, Nt);
+        }
+        else{
+            unsigned int InterfaceNode = static_cast<int>(s/he);
+            unsigned int Nt_active = InterfaceNode + 1;//active number of nodes for solving heat equation
 
-        Eigen::VectorXd D_active = SolveHeatEqn(Nt_active);
+            Eigen::VectorXd D_active = SolveHeatEqn(Nt_active);
 
-        D_full.head(Nt_active) = D_active;
-        D_full.tail(Nt - Nt_active).setConstant(T0);
+            D_full.head(Nt_active) = D_active;
+            D_full.tail(Nt - Nt_active).setConstant(T0);
 
-        std::string filename = "solutions/solution_t_" + std::to_string(n) + ".out";
-        writeArrayToOutFile(filename, D_full, Nt);
+            std::string filename = "solutions/solution_t_" + std::to_string(n) + ".out";
+            writeArrayToOutFile(filename, D_full, Nt);
 
-        double dTdx = (D_active(InterfaceNode) - D_full(InterfaceNode - 1))/he;
-        double InterfaceSpeed = -1*(Kl/(rho*LatentHeat))*dTdx;
+            double dTdx = (D_active(InterfaceNode) - D_full(InterfaceNode - 1))/he;
+            double InterfaceSpeed = -1*(Kl/(rho*LatentHeat))*dTdx;
 
-        s += InterfaceSpeed*dt;
-        interface_locs.push_back(s);
+            s += InterfaceSpeed*dt;
+            interface_locs.push_back(s);
+        }
     }
 
     //write interface locations to file
