@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include <MeshGenerator.hpp>
+#include <Quadrature.hpp>
 
 int main(){
 
@@ -44,5 +45,11 @@ int main(){
     //Mesh generation
     MeshGenerator<Nsd, Nne, BfOrder> meshGen(x1_ll, x1_ul, Nel_x1);
     Mesh<Nsd,Nne> mesh = meshGen.buildMesh();
+    mesh.writeToFiles("mesh");
+
+    std::cout << "Mesh built: " << mesh.Nnodes() << " nodes, " << mesh.Nelements() << " elements" << std::endl;
+    std::cout << "--------------------" << std::endl;
+
+    
 
 }
