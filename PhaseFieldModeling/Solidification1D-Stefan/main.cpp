@@ -1,0 +1,48 @@
+#include <iostream>
+#include <math.h>
+#include <MeshGenerator.hpp>
+
+int main(){
+
+    constexpr unsigned int Nsd = 1;
+    constexpr unsigned int BfOrder = 1;
+    constexpr unsigned int Nne = 2;
+
+    //Quadrature order
+    unsigned int quadOrder = 2;
+
+    //Problem parameters
+    double rho = 1000.0; //Kg/m3
+    double Cs = 2000.0; //J/Kg-K
+    double Cl = 4000.0; //J/Kg-K 
+    double Ks = 2.0; //W/m-K
+    double Kl = 0.6; //W/m-K
+    double LatentHeat = 1e5; //J/Kg
+    double Tm = 0.0; //K
+
+    double sigma = 0.01; //J/m2
+    double mu = 1e-2; //m/s-K
+
+    //Assumptions
+    double epsilon = 4*1e-4;
+    //Derived quantities
+    double W = 2.0;
+    double delta = epsilon*sqrt(2/W);
+    double lambda = (5/8)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat;
+    double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat);
+
+    //Mesh
+    double x1_ll = 0.0, x1_ul = 0.01;
+    double Nel_x1 = 100;
+    double h = (x1_ul - x1_ll)/Nel_x1;
+    std::cout << "Mesh size h: " << h << std::endl;
+    std::cout << "Delta: " << delta << std::endl;
+    if(delta < 4*h){
+        throw std::runtime_error("Delta condition not satisfied. Mesh is too coarse for the given epsilon. Please refine the mesh.");
+    }
+
+    //Mesh generation
+    MeshGenerator<Nsd, Nne, BfOrder> meshGen(x1_ll, x1_ul, Nel_x1);
+    Mesh<Nsd,Nne> mesh = meshGen.buildMesh();
+
+}
