@@ -14,6 +14,8 @@ int main(){
     //Quadrature order
     unsigned int quadOrder = 2;
 
+    std::cout << "Solving " << Nsd << "D problem with " << Nne << " node elements and " << BfOrder << " order basis functions." << std::endl;
+
     //Problem parameters
     double rho = 1000.0; //Kg/m3
     double Cs = 2000.0; //J/Kg-K
@@ -68,4 +70,15 @@ int main(){
     bcs_T.printSummary(); //print a summary of the boundary conditions
     std::cout << "--------------------" << std::endl;
 
+    //Boundary conditions on phi
+    BoundaryConditions<Nsd,Nne> bcs_phi(mesh);
+    for(unsigned int i = 0 ; i < mesh.Nnodes() ; i++){
+        if(mesh.nodes[i].x1 ==  x1_ll || mesh.nodes[i].x1 == x1_ul){
+            bcs_phi.addNeumann(i , 0 , 0.0);
+        }
+    }
+    bcs_phi.buildBCs();
+    std::cout << "Boundary conditions on T:" << std::endl;
+    bcs_phi.printSummary(); //print a summary of the boundary conditions
+    std::cout << "--------------------" << std::endl;
 }

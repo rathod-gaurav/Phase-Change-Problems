@@ -22,11 +22,8 @@ void BoundaryConditions<Nsd,Nne>::addNeumann(unsigned int node, int dof, double 
         throw std::runtime_error("Cannot add Neumann boundary condition to a node that already has a Dirichlet boundary condition.");
     }
     // Store the Neumann boundary condition (implementation details depend on your specific needs)
-    if(globalNodeIndex == 0){ //first node || only customised for 1D problem
-        neumannVals_[globalNodeIndex] = solution_[globalNodeIndex + 1] - value*(mesh_.nodes[globalNodeIndex + 1].x1 - mesh_.nodes[globalNodeIndex].x1); //assuming uniform mesh and linear elements
-    }
-    if(globalNodeIndex == totalDOFs_ - 1){ //last node || only customised for 1D problem
-        neumannVals_[globalNodeIndex] = solution_[globalNodeIndex - 1] + value*(mesh_.nodes[globalNodeIndex].x1 - mesh_.nodes[globalNodeIndex - 1].x1); //assuming uniform mesh and linear elements
+    else{
+        neumannVals_[globalNodeIndex] = value;
     }
 }
 
@@ -57,12 +54,16 @@ void BoundaryConditions<Nsd,Nne>::buildBCs(){
 };
 
 template <unsigned int Nsd, unsigned int Nne>
-void BoundaryConditions<Nsd,Nne>::applyToSolution(Eigen::VectorXd& solution, double incrementFraction) const{
+void BoundaryConditions<Nsd,Nne>::applyDirischletToSolution(Eigen::VectorXd& solution, double incrementFraction) const{
     for(const auto& [dof,val] : dirischletVals_){
         solution(dof) = val * incrementFraction; //apply the dirischlet boundary conditions to the solution vector based on the current increment fraction
     }
+};
+
+template <unsigned int Nsd, unsigned int Nne>
+void BoundaryConditions<Nsd,Nne>::applyNeumannToForceVector(Eigen::VectorXd& forceVector) const{
     for(const auto& [dof,val] : neumannVals_){
-        solution(dof) = val; //apply the neumann boundary conditions to the solution vector based on the current increment fraction
+        forceVector(dof) += val; //apply the neumann boundary conditions to the force vector
     }
 };
 
@@ -73,8 +74,4 @@ void BoundaryConditions<Nsd,Nne>::printSummary() const{
     std::cout << "Dirischlet DOFs: " << dirischletIndexes_.size() << std::endl;
     std::cout << "Neumann DOFs: " << neumannIndexes_.size() << std::endl;
     std::cout << "Unknown DOFs: " << unknownIndexes_.size() << std::endl;
-
-    for(const auto& [dof,val] : neumannVals_){
-        std::cout << dof << " : " << val << std::endl;
-    }
 };

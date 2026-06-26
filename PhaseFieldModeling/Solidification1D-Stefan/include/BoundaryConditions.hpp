@@ -17,8 +17,8 @@ class BoundaryConditions{
 
         void buildBCs(); //function to build the boundary conditions
 
-        void applyToSolution(Eigen::VectorXd& solution, double incrementFraction) const; //function to apply the boundary conditions to the solution vector u based on the current increment fraction (used for incremental loading)
-
+        void applyDirischletToSolution(Eigen::VectorXd& solution, double incrementFraction) const; //function to apply the boundary conditions to the solution vector u based on the current increment fraction (used for incremental loading)
+        void applyNeumannToForceVector(Eigen::VectorXd& forceVector) const; //function to apply the neumann boundary conditions to the force vector
         //Query methods
         const std::vector<unsigned int>& getUnknownIndexes() const { return unknownIndexes_; } //function to return indexes of the unknown degrees of freedom
         const std::vector<unsigned int>& getDirischletIndexes() const { return dirischletIndexes_; } //function to return the indexes of the dirischlet degrees of freedom
