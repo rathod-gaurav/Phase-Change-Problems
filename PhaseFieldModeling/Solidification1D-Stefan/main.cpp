@@ -1,7 +1,9 @@
 #include <iostream>
+#include <stdexcept>
 #include <math.h>
 #include <MeshGenerator.hpp>
 #include <Quadrature.hpp>
+#include <BoundaryConditions.hpp>
 
 int main(){
 
@@ -20,6 +22,7 @@ int main(){
     double Kl = 0.6; //W/m-K
     double LatentHeat = 1e5; //J/Kg
     double Tm = 0.0; //K
+    double Tcold = -10.0; //K
 
     double sigma = 0.01; //J/m2
     double mu = 1e-2; //m/s-K
@@ -50,6 +53,19 @@ int main(){
     std::cout << "Mesh built: " << mesh.Nnodes() << " nodes, " << mesh.Nelements() << " elements" << std::endl;
     std::cout << "--------------------" << std::endl;
 
-    
+    //Boundary Conditions on T
+    BoundaryConditions<Nsd,Nne> bcs_T(mesh);
+    for(unsigned int i = 0 ; i < mesh.Nnodes() ; i++){
+        if(mesh.nodes[i].x1 == x1_ll){
+            bcs_T.addDirischlet(i , 0 , Tcold);
+        }
+        if(mesh.nodes[i].x1 == x1_ul){
+            bcs_T.addNeumann(i , 0 , 0.0);
+        }
+    }
+    bcs_T.buildBCs();
+    std::cout << "Boundary conditions on T:" << std::endl;
+    bcs_T.printSummary(); //print a summary of the boundary conditions
+    std::cout << "--------------------" << std::endl;
 
 }
