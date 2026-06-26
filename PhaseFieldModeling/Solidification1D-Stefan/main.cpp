@@ -4,6 +4,7 @@
 #include <MeshGenerator.hpp>
 #include <Quadrature.hpp>
 #include <BoundaryConditions.hpp>
+#include <ElementEvaluator.hpp>
 
 int main(){
 
@@ -78,7 +79,11 @@ int main(){
         }
     }
     bcs_phi.buildBCs();
-    std::cout << "Boundary conditions on T:" << std::endl;
+    std::cout << "Boundary conditions on phi:" << std::endl;
     bcs_phi.printSummary(); //print a summary of the boundary conditions
     std::cout << "--------------------" << std::endl;
+
+    //Problem physics stack
+    QuadratureRule<Nsd,Nne>                 quadRule = Quadrature<Nsd,Nne>::gauss_legendre(quadOrder);
+    ElementEvaluator<Nsd,Nne,BfOrder>       elemEval(mesh, quadRule);
 }

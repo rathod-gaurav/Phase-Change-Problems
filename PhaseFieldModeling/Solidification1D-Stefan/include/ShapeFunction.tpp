@@ -64,7 +64,7 @@ ShapeFunction<Nsd,Nne,BfOrder>::basis_gradient(unsigned int node, const VectorNs
     if constexpr (BfOrder == 1){
         if constexpr (Nsd == 1){
             if constexpr (Nne == 2){
-                double basis_gradient xi1;
+                double basis_gradient_xi1;
                 switch (node){
                     case 0:
                         basis_gradient_xi1 = -0.5;
