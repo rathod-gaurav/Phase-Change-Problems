@@ -25,10 +25,6 @@ void Assembler<Nsd,Nne,BfOrder>::assembleSystem(
     unsigned int Nt = mesh_.Nnodes();
     unsigned int Nel_t = mesh_.Nelements();
 
-    Eigen::MatrixXd Mphi_global = Eigen::MatrixXd::Zero(Nt,Nt);
-    Eigen::MatrixXd Kphi_global = Eigen::MatrixXd::Zero(Nt,Nt);
-    Eigen::VectorXd Rphi_global = Eigen::VectorXd::Zero(Nt);
-
     Eigen::MatrixXd Mphi_e = Eigen::MatrixXd::Zero(Nne,Nne);
     Eigen::MatrixXd Kphi_e = Eigen::MatrixXd::Zero(Nne,Nne);
     Eigen::VectorXd Rphi_e = Eigen::VectorXd::Zero(Nne);
@@ -49,8 +45,8 @@ void Assembler<Nsd,Nne,BfOrder>::assembleSystem(
 
         //Assemble
         unsigned int Aglobal_e = mesh_.elements[e].node[0];
-        Mphi_global.block(Aglobal_e,Aglobal_e,Nne,Nne) += Mphi_e;
-        Kphi_global.block(Aglobal_e,Aglobal_e,Nne,Nne) += Kphi_e;
-        Rphi_global.segment(Aglobal_e,Nne) += Rphi_e;
+        Mphi.block(Aglobal_e,Aglobal_e,Nne,Nne) += Mphi_e;
+        Kphi.block(Aglobal_e,Aglobal_e,Nne,Nne) += Kphi_e;
+        Rphi.segment(Aglobal_e,Nne) += Rphi_e;
     }
 }

@@ -13,6 +13,9 @@ int main(){
     constexpr unsigned int BfOrder = 1;
     constexpr unsigned int Nne = 2;
 
+    //Number of timesteps to solve for
+    unsigned int NT = 100;
+
     //Quadrature order
     unsigned int quadOrder = 2;
 
