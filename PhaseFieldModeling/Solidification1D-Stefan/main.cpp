@@ -5,6 +5,7 @@
 #include <Quadrature.hpp>
 #include <BoundaryConditions.hpp>
 #include <ElementEvaluator.hpp>
+#include <Assembler.hpp>
 
 int main(){
 
@@ -37,6 +38,14 @@ int main(){
     double delta = epsilon*sqrt(2/W);
     double lambda = (5/8)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat;
     double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat);
+
+    //PhaseField Model functions
+    auto gFunc = [](double phi){ return phi*phi*(1 - phi)*(1 - phi); };
+    auto pFunc = [](double phi){ return pow(phi,3)*(10 - 15*phi + 6*pow(phi,2)); };
+    auto gFuncDerivative = [](double phi){ return 2*phi*(1 - phi)*(1 - 2*phi); };
+    auto pFuncDerivative = [gFunc](double phi){ return 30*gFunc(phi); };
+    auto Cphi = [Cs, Cl, pFunc](double phi){ return Cs + (Cl - Cs)*pFunc(phi); };
+    auto Kphi = [Ks, Kl, pFunc](double phi){ return Ks + (Kl - Ks)*pFunc(phi); };
 
     //Mesh
     double x1_ll = 0.0, x1_ul = 0.01;
@@ -83,7 +92,13 @@ int main(){
     bcs_phi.printSummary(); //print a summary of the boundary conditions
     std::cout << "--------------------" << std::endl;
 
+    //Initialize the phi and T global vectors
+    Eigen::VectorXd phi = Eigen::VectorXd::Zero(mesh.Nnodes());
+    Eigen::VectorXd T = Eigen::VectorXd::Zero(mesh.Nnodes());
+
     //Problem physics stack
     QuadratureRule<Nsd,Nne>                 quadRule = Quadrature<Nsd,Nne>::gauss_legendre(quadOrder);
-    ElementEvaluator<Nsd,Nne,BfOrder>       elemEval(mesh, quadRule);
+    ElementEvaluator<Nsd,Nne,BfOrder>       elemEval(mesh, quadRule, rho, W, lambda, LatentHeat, Tm, phi, T, gFunc, pFunc, gFuncDerivative, pFuncDerivative, Cphi, Kphi);
+    Assembler<Nsd,Nne,BfOrder>              assembler(mesh,elemEval);
+    
 }

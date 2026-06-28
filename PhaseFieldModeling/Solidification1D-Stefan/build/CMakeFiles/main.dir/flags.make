@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include -I/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0
 
-CXX_FLAGS =  -O3 -g -march=native -std=gnu++17
+CXX_FLAGS =  -O3 -g -march=native -std=gnu++20
 
