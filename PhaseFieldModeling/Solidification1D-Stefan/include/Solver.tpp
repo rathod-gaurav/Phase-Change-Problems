@@ -49,8 +49,11 @@ void PhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
             RT
         );
 
-        assembler.partition(Mphi, Kphi, Rphi, bcs_phi, MphiUU, MphiUD, KphiUU, KphiUD, RphiI);
+        assembler.partition(Mphi, Kphi, Rphi, phi, bcs_phi, MphiUU, MphiUD, KphiUU, KphiUD, RphiU, phiU);
         
+        Eigen::MatrixXd LHS = tau_*epsilon_*epsilon_*MphiUU + dt_*epsilon_*epsilon_*KphiUU;
+        Eigen::MatrixXd RHS = tau_*epsilon_*epsilon_*MphiUU*phiU + dt_*RphiU;
+
         Eigen::VectorXd phi_np1 = LHS.PartialPivLu().solve(RHS);
 
     }

@@ -24,11 +24,26 @@ class Assembler{
             Eigen::VectorXd& RT
         );
 
-        // void partition(
-
-        // )
+        void partition(
+            Eigen::MatrixXd& M,
+            Eigen::MatrixXd& K,
+            Eigen::VectorXd& R,
+            Eigen::VectorXd& solution,
+            BoundaryConditions<Nsd,Nne>& bcs,
+            Eigen::MatrixXd& MUU,
+            Eigen::MatrixXd& MUD,
+            Eigen::MatrixXd& KUU,
+            Eigen::MatrixXd& KUD,
+            Eigen::VectorXd& RU
+        );
     
     private:
+        Eigen::MatrixXd extractSubmatrix(
+            const Eigen::MatrixXd& K,
+            const std::vector<unsigned int>& rows,
+            const std::vector<unsigned int>& cols
+        ) const ;
+
         const Mesh<Nsd,Nne>& mesh_;
         const ElementEvaluator<Nsd,Nne,BfOrder>& elem_evaluator_;
 

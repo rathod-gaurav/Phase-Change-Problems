@@ -47,7 +47,7 @@ void BoundaryConditions<Nsd,Nne>::buildBCs(){
     }
     //everything else is free
     for(unsigned int i = 0 ; i < totalDOFs_ ; i++){
-        if(!isDirischlet_[i] && !isNeumann_[i]){ //check if the degree of freedom is not subject to dirischlet or neumann boundary conditions
+        if(!isDirischlet_[i]){ //check if the degree of freedom is not subject to dirischlet or neumann boundary conditions
             unknownIndexes_.push_back(i); //add the degree of freedom to the unknownIndexes vector if it is not subject to dirischlet boundary conditions
         }
     }
