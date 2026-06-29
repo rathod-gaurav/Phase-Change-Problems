@@ -1,7 +1,7 @@
 [
 {
   "directory": "/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/build",
-  "command": "/usr/bin/c++  -I/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include -I/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0  -O3 -g -march=native -std=gnu++20 -o CMakeFiles/main.dir/main.cpp.o -c /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/main.cpp",
+  "command": "/usr/bin/g++  -I/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include -I/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0  -O3 -g -march=native -std=gnu++20 -o CMakeFiles/main.dir/main.cpp.o -c /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/main.cpp",
   "file": "/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/main.cpp",
   "output": "CMakeFiles/main.dir/main.cpp.o"
 }

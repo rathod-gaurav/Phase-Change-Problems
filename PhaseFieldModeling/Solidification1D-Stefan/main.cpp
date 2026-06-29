@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <math.h>
+#include <cmath>
 #include <MeshGenerator.hpp>
 #include <Quadrature.hpp>
 #include <BoundaryConditions.hpp>
@@ -53,8 +54,8 @@ int main(){
     auto Kphi = [Ks, Kl, pFunc](double phi){ return Ks + (Kl - Ks)*pFunc(phi); };
 
     //Mesh
-    double x1_ll = 0.0, x1_ul = 0.1;
-    double Nel_x1 = 1000;
+    double x1_ll = 0.0, x1_ul = 0.01;
+    double Nel_x1 = 100;
     double h = (x1_ul - x1_ll)/Nel_x1;
     std::cout << "Mesh size h: " << h << std::endl;
     std::cout << "Delta: " << delta << std::endl;
@@ -101,10 +102,20 @@ int main(){
     //Initialize the phi and T global vectors
     Eigen::VectorXd phi = Eigen::VectorXd::Zero(mesh.Nnodes());
     Eigen::VectorXd T = Eigen::VectorXd::Zero(mesh.Nnodes());
+    double X0 = 0.0;
+    for(unsigned int i = 0 ; i > mesh.Nnodes() ; i++){
+        phi(i) = 0.5*(1 - std::tanh((mesh.nodes[i].x1 - X0)/delta));
+        T(i) = Tm;
+    }
 
     //Problem physics stack
-    QuadratureRule<Nsd,Nne>                 quadRule = Quadrature<Nsd,Nne>::gauss_legendre(quadOrder);
-    ElementEvaluator<Nsd,Nne,BfOrder>       elemEval(mesh, quadRule, rho, W, lambda, LatentHeat, Tm, phi, T, gFunc, pFunc, gFuncDerivative, pFuncDerivative, Cphi, Kphi);
-    Assembler<Nsd,Nne,BfOrder>              assembler(mesh,elemEval);
-    CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>                 solver(tau, epsilon, dt, NT, 1.0);
+    QuadratureRule<Nsd,Nne>                     quadRule = Quadrature<Nsd,Nne>::gauss_legendre(quadOrder);
+    ElementEvaluator<Nsd,Nne,BfOrder>           elemEval(mesh, quadRule, rho, W, lambda, LatentHeat, Tm, phi, T, gFunc, pFunc, gFuncDerivative, pFuncDerivative, Cphi, Kphi);
+    Assembler<Nsd,Nne,BfOrder>                  assembler(mesh,elemEval);
+    CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>    solver(tau, epsilon, dt, NT, 1.0);
+
+    std::cout << "Starting the solver..." << std::endl;
+    solver.solve(phi, T, assembler, bcs_phi, bcs_T);
+    std::cout << "Solve completed." << std::endl;
+
 }

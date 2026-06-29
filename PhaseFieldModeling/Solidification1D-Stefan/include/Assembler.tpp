@@ -37,7 +37,7 @@ void Assembler<Nsd,Nne,BfOrder>::assembleSystem_phi(
     Eigen::MatrixXd& Mphi,
     Eigen::MatrixXd& Kphi,
     Eigen::VectorXd& Rphi
-){
+) const{
     unsigned int Nt = mesh_.Nnodes();
     unsigned int Nel_t = mesh_.Nelements();
     Mphi = Eigen::MatrixXd::Zero(Nt,Nt);
@@ -49,7 +49,7 @@ void Assembler<Nsd,Nne,BfOrder>::assembleSystem_phi(
     Eigen::VectorXd Rphi_e = Eigen::VectorXd::Zero(Nne);
 
     for(unsigned int e = 0 ; e < Nel_t ; e++){
-        elem_evaluator_.compute_element_phi(
+        elem_evaluator_.computeElement_phi(
             e,
             Mphi_e,
             Kphi_e,
@@ -71,7 +71,7 @@ void Assembler<Nsd,Nne,BfOrder>::assembleSystem_T(
     Eigen::VectorXd& RT,
     Eigen::VectorXd& phi_np1,
     const double& dt
-){
+) const{
     unsigned int Nt = mesh_.Nnodes();
     unsigned int Nel_t = mesh_.Nelements();
     MT = Eigen::MatrixXd::Zero(Nt,Nt);
@@ -83,7 +83,7 @@ void Assembler<Nsd,Nne,BfOrder>::assembleSystem_T(
     Eigen::VectorXd RT_e = Eigen::VectorXd::Zero(Nne);
 
     for(unsigned int e = 0 ; e < Nel_t ; e++){
-        elem_evaluator_.compute_element_T(
+        elem_evaluator_.computeElement_T(
             e,
             MT_e,
             KT_e,
@@ -106,13 +106,14 @@ void Assembler<Nsd,Nne,BfOrder>::partition(
     Eigen::MatrixXd& K,
     Eigen::VectorXd& R,
     Eigen::VectorXd& solution,
-    BoundaryConditions<Nsd,Nne>& bcs,
+    const BoundaryConditions<Nsd,Nne>& bcs,
     Eigen::MatrixXd& MUU,
     Eigen::MatrixXd& MUD,
     Eigen::MatrixXd& KUU,
     Eigen::MatrixXd& KUD,
-    Eigen::VectorXd& RU
-){
+    Eigen::VectorXd& RU,
+    Eigen::VectorXd& solutionU
+) const{
     const auto& dirischletIndexes = bcs.getDirischletIndexes();
     const auto& unknownIndexes = bcs.getUnknownIndexes();
 
@@ -122,7 +123,9 @@ void Assembler<Nsd,Nne,BfOrder>::partition(
     KUD = extractSubmatrix(K, unknownIndexes, dirischletIndexes);
 
     RU.resize(unknownIndexes.size());
+    solutionU.resize(unknownIndexes.size());
     for(unsigned int i = 0 ; i < unknownIndexes.size() ; i++){
-        RU(i) = Rglobal(unknownIndexes[i]);
+        RU(i) = R(unknownIndexes[i]);
+        solutionU(i) = solution(unknownIndexes[i]);
     }
 }

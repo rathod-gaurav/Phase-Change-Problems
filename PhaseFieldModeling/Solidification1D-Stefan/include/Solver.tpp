@@ -33,8 +33,8 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
     Eigen::MatrixXd KT, KTUU, KTUD;
     Eigen::VectorXd RT, RTU;
 
-    Eigen::VectorXd& phiU, phi_np1U, phi_np1; 
-    Eigen::VectorXd& TU, T_np1U, T_np1;
+    Eigen::VectorXd phiU, phi_np1U, phi_np1; 
+    Eigen::VectorXd TU, T_np1U, T_np1;
 
     double t = dt_;
     for(unsigned int timestep = 1 ; timestep < NT_ ; timestep++){
@@ -55,9 +55,9 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
 
         phi_np1U = LHS_phi.partialPivLu().solve(RHS_phi);
         phi_np1.resize(phi.size());
-        const auto& unknownIndexes = bcs_phi.getUnknownIndexes();
-        for(unsigned int i = 0 ; i < unknownIndexes.size() ; i++){
-            phi_np1(unknownIndexes[i]) = phi_np1U[i];
+        const auto& unknownIndexes_phi = bcs_phi.getUnknownIndexes();
+        for(unsigned int i = 0 ; i < unknownIndexes_phi.size() ; i++){
+            phi_np1(unknownIndexes_phi[i]) = phi_np1U[i];
         }
         bcs_phi.applyDirischletToSolution(phi_np1,incrFraction);
 
@@ -78,8 +78,9 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
         Eigen::VectorXd RHS_T = MTUU*TU + dt_*RTU;
         T_np1U = LHS_T.partialPivLu().solve(RHS_T);
         T_np1.resize(T.size());
-        for(unsigned int i = 0 ; i < unknownIndexes.size() ; i++){
-            T_np1(unknownIndexes[i]) = T_np1U[i];
+        const auto& unknownIndexes_T = bcs_T.getUnknownIndexes();
+        for(unsigned int i = 0 ; i < unknownIndexes_T.size() ; i++){
+            T_np1(unknownIndexes_T[i]) = T_np1U[i];
         }
         bcs_T.applyDirischletToSolution(T_np1, incrFraction);
 

@@ -17,7 +17,7 @@ class Assembler{
             Eigen::MatrixXd& Mphi,
             Eigen::MatrixXd& Kphi,
             Eigen::VectorXd& Rphi
-        );
+        ) const;
 
         void assembleSystem_T(
             Eigen::MatrixXd& MT,
@@ -25,20 +25,21 @@ class Assembler{
             Eigen::VectorXd& RT,
             Eigen::VectorXd& phi_np1,
             const double& dt
-        );
+        ) const;
 
         void partition(
             Eigen::MatrixXd& M,
             Eigen::MatrixXd& K,
             Eigen::VectorXd& R,
             Eigen::VectorXd& solution,
-            BoundaryConditions<Nsd,Nne>& bcs,
+            const BoundaryConditions<Nsd,Nne>& bcs,
             Eigen::MatrixXd& MUU,
             Eigen::MatrixXd& MUD,
             Eigen::MatrixXd& KUU,
             Eigen::MatrixXd& KUD,
-            Eigen::VectorXd& RU
-        );
+            Eigen::VectorXd& RU,
+            Eigen::VectorXd& solutionU
+        ) const;
     
     private:
         Eigen::MatrixXd extractSubmatrix(

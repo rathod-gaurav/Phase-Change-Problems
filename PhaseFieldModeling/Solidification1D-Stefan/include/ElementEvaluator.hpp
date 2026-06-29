@@ -30,14 +30,14 @@ class ElementEvaluator{
             unsigned int e,
             Eigen::MatrixXd& Mphi_e,
             Eigen::MatrixXd& Kphi_e,
-            Eigen::MatrixXd& Rphi_e
+            Eigen::VectorXd& Rphi_e
         ) const;
 
         void computeElement_T(
             unsigned int e,
             Eigen::MatrixXd& MT_e,
             Eigen::MatrixXd& KT_e,
-            Eigen::MatrixXd& RT_e,
+            Eigen::VectorXd& RT_e,
             Eigen::VectorXd& phi_np1,
             const double& dt
         ) const;

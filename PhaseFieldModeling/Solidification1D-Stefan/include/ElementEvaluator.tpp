@@ -57,11 +57,11 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement_phi(
     unsigned int e,
     Eigen::MatrixXd& Mphi_e,
     Eigen::MatrixXd& Kphi_e,
-    Eigen::MatrixXd& Rphi_e
+    Eigen::VectorXd& Rphi_e
 ) const{
       Mphi_e = Eigen::MatrixXd::Zero(Nne,Nne);
       Kphi_e = Eigen::MatrixXd::Zero(Nne,Nne);
-      Rphi_e = Eigen::VectorXd::Zero(Nne,Nne);
+      Rphi_e = Eigen::VectorXd::Zero(Nne);
 
       if constexpr (Nsd == 1){
         if constexpr (Nne == 2){
@@ -96,7 +96,7 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement_phi(
                         VectorNsd basis_gradient_vecB = ShapeFunction<Nsd,Nne,BfOrder>::basis_gradient(B, xi_vec);
 
                         double Mphi_AB = N_A * N_B * JacDet * weight;
-                        double Kphi_AB = JacInv*basis_gradient_vecA*JacInv*basis_gradient_vecB*JacDet*weight;
+                        double Kphi_AB = (JacInv*basis_gradient_vecA*JacInv*basis_gradient_vecB*JacDet*weight).value();
                         Mphi_e(A,B) = Mphi_AB;
                         Kphi_e(A,B) = Kphi_AB;
                     }
@@ -118,13 +118,13 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement_T(
     unsigned int e,
     Eigen::MatrixXd& MT_e,
     Eigen::MatrixXd& KT_e,
-    Eigen::MatrixXd& RT_e,
+    Eigen::VectorXd& RT_e,
     Eigen::VectorXd& phi_np1,
     const double& dt
 ) const{
       MT_e = Eigen::MatrixXd::Zero(Nne,Nne);
       KT_e = Eigen::MatrixXd::Zero(Nne,Nne);
-      RT_e = Eigen::VectorXd::Zero(Nne,Nne);
+      RT_e = Eigen::VectorXd::Zero(Nne);
 
       if constexpr (Nsd == 1){
         if constexpr (Nne == 2){
@@ -161,7 +161,7 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement_T(
                         VectorNsd basis_gradient_vecB = ShapeFunction<Nsd,Nne,BfOrder>::basis_gradient(B, xi_vec);
 
                         double MT_AB = rho_*Cphi_(phi_np1_h)*N_A*N_B*JacDet*weight;
-                        double KT_AB = Kphi_(phi_np1_h)*JacInv*basis_gradient_vecA*JacInv*basis_gradient_vecB*JacDet*weight;
+                        double KT_AB = (Kphi_(phi_np1_h)*JacInv*basis_gradient_vecA*JacInv*basis_gradient_vecB*JacDet*weight).value();
                         MT_e(A,B) = MT_AB;
                         KT_e(A,B) = KT_AB;
                     }
