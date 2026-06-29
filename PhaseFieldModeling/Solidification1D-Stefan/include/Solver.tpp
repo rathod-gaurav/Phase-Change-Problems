@@ -24,7 +24,7 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
     const Assembler<Nsd,Nne,BfOrder>& assembler,
     const BoundaryConditions<Nsd,Nne>& bcs_phi,
     const BoundaryConditions<Nsd,Nne>& bcs_T,
-    std::function<void(unsigned int, unsigned int, double)> iterCallback //optional callback function for monitoring
+    std::function<void(unsigned int, double, const Eigen::VectorXd&, const Eigen::VectorXd&)> iterCallback //optional callback function for monitoring
 ){
     Eigen::MatrixXd Mphi, MphiUU, MphiUD;
     Eigen::MatrixXd Kphi, KphiUU, KphiUD;
@@ -87,5 +87,16 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
         phi = phi_np1;
         T = T_np1;
 
+        if (iterCallback) {
+            iterCallback(timestep, t, phi, T);
+        }
+
+        bool is_phi_bounded = (phi.array() >= 0.0).all() && (phi.array() <= 1.0).all();
+        if (!is_phi_bounded) {
+            std::cout << "Out of bounds phi detected!\n";
+            break;
+        }
+
+        t+=dt_;
     }
 }

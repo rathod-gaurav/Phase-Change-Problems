@@ -21,7 +21,7 @@ class CoupledPhaseFieldSolver{
             const Assembler<Nsd,Nne,BfOrder>& assembler,
             const BoundaryConditions<Nsd,Nne>& bcs_phi,
             const BoundaryConditions<Nsd,Nne>& bcs_T,
-            std::function<void(unsigned int, unsigned int, double)> iterCallback = nullptr //optional callback function for monitoring
+            std::function<void(unsigned int, double, const Eigen::VectorXd&, const Eigen::VectorXd&)> iterCallback = nullptr //optional callback function for monitoring
         );
     
     private:

@@ -8,6 +8,7 @@
 #include <ElementEvaluator.hpp>
 #include <Assembler.hpp>
 #include <Solver.hpp>
+#include <OutputWriter.hpp>
 
 int main(){
 
@@ -113,9 +114,14 @@ int main(){
     ElementEvaluator<Nsd,Nne,BfOrder>           elemEval(mesh, quadRule, rho, W, lambda, LatentHeat, Tm, phi, T, gFunc, pFunc, gFuncDerivative, pFuncDerivative, Cphi, Kphi);
     Assembler<Nsd,Nne,BfOrder>                  assembler(mesh,elemEval);
     CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>    solver(tau, epsilon, dt, NT, 1.0);
+    OutputWriter<Nsd,Nne>                       writer(mesh, "output_data", "localhost", 8000);
 
     std::cout << "Starting the solver..." << std::endl;
-    solver.solve(phi, T, assembler, bcs_phi, bcs_T);
+    solver.solve(phi, T, assembler, bcs_phi, bcs_T,
+                [&](unsigned int timestep, double time, const Eigen::VectorXd& phi, const Eigen::VectorXd& T){
+                    writer.writeAndSend(timestep, time, phi, T);
+                }
+    );
     std::cout << "Solve completed." << std::endl;
 
 }
