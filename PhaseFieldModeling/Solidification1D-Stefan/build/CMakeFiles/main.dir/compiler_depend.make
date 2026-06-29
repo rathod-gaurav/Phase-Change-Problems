@@ -16,6 +16,8 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
   /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Quadrature.tpp \
   /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/ShapeFunction.hpp \
   /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/ShapeFunction.tpp \
+  /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Solver.hpp \
+  /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Solver.tpp \
   /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/Cholesky \
   /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/Core \
   /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/Dense \
@@ -831,17 +833,11 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/cpu_defines.h:
 
-/usr/include/c++/13/bits/exception.h:
-
-/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Mesh.hpp:
-
 /usr/include/c++/13/bits/cpp_type_traits.h:
 
 /usr/include/c++/13/bits/basic_string.h:
 
 /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/ElementEvaluator.hpp:
-
-/usr/include/c++/13/bits/exception_defines.h:
 
 /usr/include/c++/13/bits/atomic_wait.h:
 
@@ -963,6 +959,10 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Assembler.tpp:
 
+/usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h:
+
+/usr/include/x86_64-linux-gnu/bits/syscall.h:
+
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/products/TriangularMatrixVector.h:
 
 /usr/include/c++/13/tr1/gamma.tcc:
@@ -1025,21 +1025,9 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/arch/SSE/MathFunctions.h:
 
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/DenseStorage.h:
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/arch/SSE/Complex.h:
 
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/DenseCoeffsBase.h:
-
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/util/Macros.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/13/include/avx512vpopcntdqintrin.h:
-
-/usr/include/c++/13/bits/codecvt.h:
-
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Householder/BlockHouseholder.h:
-
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/plugins/ReshapedMethods.inc:
-
-/usr/include/c++/13/ext/string_conversions.h:
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/arch/Default/Settings.h:
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/VectorwiseOp.h:
 
@@ -1141,6 +1129,10 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/Dot.h:
 
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/util/Macros.h:
+
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/DenseCoeffsBase.h:
+
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/plugins/MatrixCwiseBinaryOps.inc:
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/Block.h:
@@ -1154,10 +1146,6 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 /usr/include/c++/13/pstl/execution_defs.h:
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/ArrayWrapper.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/13/include/mm_malloc.h:
-
-/usr/include/c++/13/algorithm:
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/Random.h:
 
@@ -1193,6 +1181,14 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/EigenBase.h:
 
+/usr/include/c++/13/clocale:
+
+/usr/include/c++/13/stdexcept:
+
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/plugins/ReshapedMethods.inc:
+
+/usr/include/c++/13/ext/string_conversions.h:
+
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Geometry/Rotation2D.h:
 
 /usr/include/c++/13/unordered_map:
@@ -1202,8 +1198,6 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 /usr/include/x86_64-linux-gnu/c++/13/bits/ctype_inline.h:
 
 /usr/include/x86_64-linux-gnu/bits/select-decl.h:
-
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Householder/InternalHeaderCheck.h:
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Geometry/OrthoMethods.h:
 
@@ -1227,9 +1221,11 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/Redux.h:
 
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Geometry/Transform.h:
+/usr/lib/gcc/x86_64-linux-gnu/13/include/avx512vpopcntdqintrin.h:
 
-/usr/include/x86_64-linux-gnu/bits/unistd-decl.h:
+/usr/include/c++/13/bits/codecvt.h:
+
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Householder/BlockHouseholder.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/avx512vp2intersectvlintrin.h:
 
@@ -1238,6 +1234,18 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 /usr/lib/gcc/x86_64-linux-gnu/13/include/avx512bf16intrin.h:
 
 /usr/include/c++/13/bits/shared_ptr_base.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/include/avx512dqintrin.h:
+
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Cholesky/LDLT.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/include/mm_malloc.h:
+
+/usr/include/c++/13/algorithm:
+
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/util/StaticAssert.h:
+
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Geometry/Translation.h:
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/CwiseUnaryView.h:
 
@@ -1255,11 +1263,25 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
 
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Householder/InternalHeaderCheck.h:
+
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/arch/AVX/PacketMath.h:
+
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Geometry/Transform.h:
+
+/usr/include/x86_64-linux-gnu/bits/unistd-decl.h:
+
+/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Mesh.hpp:
+
+/usr/include/c++/13/bits/exception.h:
+
+/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Solver.hpp:
+
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/CwiseBinaryOp.h:
+
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/InnerProduct.h:
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/CwiseNullaryOp.h:
-
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/CwiseBinaryOp.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/rdseedintrin.h:
 
@@ -1375,6 +1397,10 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/Version:
 
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/FindCoeff.h:
+
+/usr/include/c++/13/bits/ranges_uninitialized.h:
+
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/util/MKL_support.h:
 
 /usr/include/c++/13/bits/stl_pair.h:
@@ -1383,17 +1409,7 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/arch/AVX/MathFunctions.h:
 
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/util/StaticAssert.h:
-
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Geometry/Translation.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/13/include/avx512dqintrin.h:
-
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Cholesky/LDLT.h:
-
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/FindCoeff.h:
-
-/usr/include/c++/13/bits/ranges_uninitialized.h:
+/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/DenseStorage.h:
 
 /usr/include/c++/13/vector:
 
@@ -1495,17 +1511,9 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/Solve.h:
 
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/arch/Default/Settings.h:
-
-/usr/include/c++/13/stdexcept:
-
-/usr/include/c++/13/clocale:
-
 /usr/lib/gcc/x86_64-linux-gnu/13/include/amxcomplexintrin.h:
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/Stride.h:
-
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/arch/AVX/PacketMath.h:
 
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/arch/Default/GenericPacketMathFunctions.h:
 
@@ -1515,11 +1523,11 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /usr/include/c++/13/bits/ostream.tcc:
 
-/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/arch/SSE/Complex.h:
-
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/arch/Default/Half.h:
 
 /usr/include/x86_64-linux-gnu/bits/fp-fast.h:
+
+/usr/include/c++/13/bits/exception_defines.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitstatus.h:
 
@@ -1544,6 +1552,8 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 /usr/include/c++/13/bits/hashtable_policy.h:
 
 /usr/include/c++/13/bits/istream.tcc:
+
+/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Solver.tpp:
 
 /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/BoundaryConditions.hpp:
 
@@ -1797,10 +1807,6 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /usr/include/c++/13/typeinfo:
 
-/usr/include/x86_64-linux-gnu/bits/syscall.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h:
-
 /usr/include/ctype.h:
 
 /usr/include/endian.h:
@@ -1975,6 +1981,10 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 
 /usr/include/x86_64-linux-gnu/bits/unistd.h:
 
+/usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h:
+
+/usr/include/x86_64-linux-gnu/bits/wchar.h:
+
 /home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0/Eigen/src/Core/StlIterators.h:
 
 /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
@@ -1986,7 +1996,3 @@ CMakeFiles/main.dir/main.cpp.o: /home/grathod/Downloads/Spring26/Lab/PhaseChange
 /usr/include/c++/13/ext/aligned_buffer.h:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/c++allocator.h:
-
-/usr/include/x86_64-linux-gnu/bits/wchar.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h:

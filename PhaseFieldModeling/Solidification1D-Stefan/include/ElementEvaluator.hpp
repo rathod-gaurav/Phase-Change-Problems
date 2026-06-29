@@ -26,14 +26,20 @@ class ElementEvaluator{
             const std::function<double(double)> Kphi
         );
 
-        void computeElement(
+        void computeElement_phi(
             unsigned int e,
             Eigen::MatrixXd& Mphi_e,
             Eigen::MatrixXd& Kphi_e,
-            Eigen::MatrixXd& Rphi_e,
+            Eigen::MatrixXd& Rphi_e
+        ) const;
+
+        void computeElement_T(
+            unsigned int e,
             Eigen::MatrixXd& MT_e,
             Eigen::MatrixXd& KT_e,
-            Eigen::MatrixXd& RT_e
+            Eigen::MatrixXd& RT_e,
+            Eigen::VectorXd& phi_np1,
+            const double& dt
         ) const;
     
     private:

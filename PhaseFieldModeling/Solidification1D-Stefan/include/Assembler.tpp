@@ -33,35 +33,27 @@ Eigen::MatrixXd Assembler<Nsd,Nne,BfOrder>::extractSubmatrix(
 }
 
 template <unsigned int Nsd, unsigned int Nne, unsigned int BfOrder>
-void Assembler<Nsd,Nne,BfOrder>::assembleSystem(
-    const Eigen::VectorXd& phi,
-    const Eigen::VectorXd& T,
+void Assembler<Nsd,Nne,BfOrder>::assembleSystem_phi(
     Eigen::MatrixXd& Mphi,
     Eigen::MatrixXd& Kphi,
-    Eigen::VectorXd& Rphi,
-    Eigen::MatrixXd& MT,
-    Eigen::MatrixXd& KT,
-    Eigen::VectorXd& RT
+    Eigen::VectorXd& Rphi
 ){
     unsigned int Nt = mesh_.Nnodes();
     unsigned int Nel_t = mesh_.Nelements();
+    Mphi = Eigen::MatrixXd::Zero(Nt,Nt);
+    Kphi = Eigen::MatrixXd::Zero(Nt,Nt);
+    Rphi = Eigen::VectorXd::Zero(Nt);
 
     Eigen::MatrixXd Mphi_e = Eigen::MatrixXd::Zero(Nne,Nne);
     Eigen::MatrixXd Kphi_e = Eigen::MatrixXd::Zero(Nne,Nne);
     Eigen::VectorXd Rphi_e = Eigen::VectorXd::Zero(Nne);
-    Eigen::MatrixXd MT_e = Eigen::MatrixXd::Zero(Nne,Nne);
-    Eigen::MatrixXd KT_e = Eigen::MatrixXd::Zero(Nne,Nne);
-    Eigen::VectorXd RT_e = Eigen::VectorXd::Zero(Nne);
 
     for(unsigned int e = 0 ; e < Nel_t ; e++){
-        elem_evaluator_.compute_element(
+        elem_evaluator_.compute_element_phi(
             e,
             Mphi_e,
             Kphi_e,
-            Rphi_e,
-            MT_e,
-            KT_e,
-            RT_e
+            Rphi_e
         );
 
         //Assemble
@@ -69,6 +61,42 @@ void Assembler<Nsd,Nne,BfOrder>::assembleSystem(
         Mphi.block(Aglobal_e,Aglobal_e,Nne,Nne) += Mphi_e;
         Kphi.block(Aglobal_e,Aglobal_e,Nne,Nne) += Kphi_e;
         Rphi.segment(Aglobal_e,Nne) += Rphi_e;
+    }
+}
+
+template <unsigned int Nsd, unsigned int Nne, unsigned int BfOrder>
+void Assembler<Nsd,Nne,BfOrder>::assembleSystem_T(
+    Eigen::MatrixXd& MT,
+    Eigen::MatrixXd& KT,
+    Eigen::VectorXd& RT,
+    Eigen::VectorXd& phi_np1,
+    const double& dt
+){
+    unsigned int Nt = mesh_.Nnodes();
+    unsigned int Nel_t = mesh_.Nelements();
+    MT = Eigen::MatrixXd::Zero(Nt,Nt);
+    KT = Eigen::MatrixXd::Zero(Nt,Nt);
+    RT = Eigen::VectorXd::Zero(Nt);
+
+    Eigen::MatrixXd MT_e = Eigen::MatrixXd::Zero(Nne,Nne);
+    Eigen::MatrixXd KT_e = Eigen::MatrixXd::Zero(Nne,Nne);
+    Eigen::VectorXd RT_e = Eigen::VectorXd::Zero(Nne);
+
+    for(unsigned int e = 0 ; e < Nel_t ; e++){
+        elem_evaluator_.compute_element_T(
+            e,
+            MT_e,
+            KT_e,
+            RT_e,
+            phi_np1,
+            dt
+        );
+
+        //Assemble
+        unsigned int Aglobal_e = mesh_.elements[e].node[0];
+        MT.block(Aglobal_e,Aglobal_e,Nne,Nne) += MT_e;
+        KT.block(Aglobal_e,Aglobal_e,Nne,Nne) += KT_e;
+        RT.segment(Aglobal_e,Nne) += RT_e;
     }
 }
 

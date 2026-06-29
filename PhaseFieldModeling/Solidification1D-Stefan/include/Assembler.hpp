@@ -13,15 +13,18 @@ class Assembler{
             const ElementEvaluator<Nsd,Nne,BfOrder>& elem_evaluator
         );
 
-        void assembleSystem(
-            const Eigen::VectorXd& phi,
-            const Eigen::VectorXd& T,
+        void assembleSystem_phi(
             Eigen::MatrixXd& Mphi,
             Eigen::MatrixXd& Kphi,
-            Eigen::VectorXd& Rphi,
+            Eigen::VectorXd& Rphi
+        );
+
+        void assembleSystem_T(
             Eigen::MatrixXd& MT,
             Eigen::MatrixXd& KT,
-            Eigen::VectorXd& RT
+            Eigen::VectorXd& RT,
+            Eigen::VectorXd& phi_np1,
+            const double& dt
         );
 
         void partition(

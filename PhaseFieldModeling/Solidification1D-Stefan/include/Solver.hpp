@@ -13,7 +13,7 @@ class CoupledPhaseFieldSolver{
             const double dt,
             const unsigned int NT,
             const unsigned int maxIncr //in case incremental loading is required for dirischlet BCs
-        )
+        );
 
         void solve(
             Eigen::VectorXd& phi,
@@ -21,7 +21,7 @@ class CoupledPhaseFieldSolver{
             const Assembler<Nsd,Nne,BfOrder>& assembler,
             const BoundaryConditions<Nsd,Nne>& bcs_phi,
             const BoundaryConditions<Nsd,Nne>& bcs_T,
-            std::function<void(unsigned int, unsigned int, double)> iterCallback = nullptr; //optional callback function for monitoring
+            std::function<void(unsigned int, unsigned int, double)> iterCallback = nullptr //optional callback function for monitoring
         );
     
     private:

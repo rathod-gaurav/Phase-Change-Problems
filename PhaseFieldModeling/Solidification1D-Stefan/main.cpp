@@ -6,6 +6,7 @@
 #include <BoundaryConditions.hpp>
 #include <ElementEvaluator.hpp>
 #include <Assembler.hpp>
+#include <Solver.hpp>
 
 int main(){
 
@@ -28,8 +29,8 @@ int main(){
     double Ks = 2.0; //W/m-K
     double Kl = 0.6; //W/m-K
     double LatentHeat = 1e5; //J/Kg
-    double Tm = 0.0; //K
-    double Tcold = -10.0; //K
+    double Tm = 273.0; //K
+    double Tcold = 263.0; //K
 
     double sigma = 0.01; //J/m2
     double mu = 1e-2; //m/s-K
@@ -41,6 +42,7 @@ int main(){
     double delta = epsilon*sqrt(2/W);
     double lambda = (5/8)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat;
     double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat);
+    double dt = 0.8*((tau*pow(epsilon,2))/W);
 
     //PhaseField Model functions
     auto gFunc = [](double phi){ return phi*phi*(1 - phi)*(1 - phi); };
@@ -51,11 +53,12 @@ int main(){
     auto Kphi = [Ks, Kl, pFunc](double phi){ return Ks + (Kl - Ks)*pFunc(phi); };
 
     //Mesh
-    double x1_ll = 0.0, x1_ul = 0.01;
-    double Nel_x1 = 100;
+    double x1_ll = 0.0, x1_ul = 0.1;
+    double Nel_x1 = 1000;
     double h = (x1_ul - x1_ll)/Nel_x1;
     std::cout << "Mesh size h: " << h << std::endl;
     std::cout << "Delta: " << delta << std::endl;
+    std::cout << "Timestep size dt: " << dt << std::endl;
     if(delta < 4*h){
         throw std::runtime_error("Delta condition not satisfied. Mesh is too coarse for the given epsilon. Please refine the mesh.");
     }
@@ -103,5 +106,5 @@ int main(){
     QuadratureRule<Nsd,Nne>                 quadRule = Quadrature<Nsd,Nne>::gauss_legendre(quadOrder);
     ElementEvaluator<Nsd,Nne,BfOrder>       elemEval(mesh, quadRule, rho, W, lambda, LatentHeat, Tm, phi, T, gFunc, pFunc, gFuncDerivative, pFuncDerivative, Cphi, Kphi);
     Assembler<Nsd,Nne,BfOrder>              assembler(mesh,elemEval);
-    
+    CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>                 solver(tau, epsilon, dt, NT, 1.0);
 }

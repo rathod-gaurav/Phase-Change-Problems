@@ -605,4 +605,6 @@ CMakeFiles/main.dir/main.cpp.o: \
  /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/ShapeFunction.tpp \
  /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/ElementEvaluator.tpp \
  /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Assembler.hpp \
- /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Assembler.tpp
+ /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Assembler.tpp \
+ /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Solver.hpp \
+ /home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/include/Solver.tpp
