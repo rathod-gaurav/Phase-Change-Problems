@@ -18,6 +18,7 @@ int main(){
 
     //Number of timesteps to solve for
     unsigned int NT = 100;
+    unsigned int incrSteps = 1;
 
     //Quadrature order
     unsigned int quadOrder = 2;
@@ -76,10 +77,10 @@ int main(){
     //Boundary Conditions on T
     BoundaryConditions<Nsd,Nne> bcs_T(mesh);
     for(unsigned int i = 0 ; i < mesh.Nnodes() ; i++){
-        if(mesh.nodes[i].x1 == x1_ll){
+        if(mesh.nodes[i].x1 == x1_ul){
             bcs_T.addDirischlet(i , 0 , Tcold);
         }
-        if(mesh.nodes[i].x1 == x1_ul){
+        if(mesh.nodes[i].x1 == x1_ll){
             bcs_T.addNeumann(i , 0 , 0.0);
         }
     }
@@ -103,8 +104,8 @@ int main(){
     //Initialize the phi and T global vectors
     Eigen::VectorXd phi = Eigen::VectorXd::Zero(mesh.Nnodes());
     Eigen::VectorXd T = Eigen::VectorXd::Zero(mesh.Nnodes());
-    double X0 = 0.0;
-    for(unsigned int i = 0 ; i > mesh.Nnodes() ; i++){
+    double X0 = 0.01;
+    for(unsigned int i = 0 ; i < mesh.Nnodes() ; i++){
         phi(i) = 0.5*(1 - std::tanh((mesh.nodes[i].x1 - X0)/delta));
         T(i) = Tm;
     }
@@ -113,8 +114,10 @@ int main(){
     QuadratureRule<Nsd,Nne>                     quadRule = Quadrature<Nsd,Nne>::gauss_legendre(quadOrder);
     ElementEvaluator<Nsd,Nne,BfOrder>           elemEval(mesh, quadRule, rho, W, lambda, LatentHeat, Tm, phi, T, gFunc, pFunc, gFuncDerivative, pFuncDerivative, Cphi, Kphi);
     Assembler<Nsd,Nne,BfOrder>                  assembler(mesh,elemEval);
-    CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>    solver(tau, epsilon, dt, NT, 1.0);
+    CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>    solver(tau, epsilon, dt, NT, incrSteps);
     OutputWriter<Nsd,Nne>                       writer(mesh, "output_data", "localhost", 8000);
+
+    writer.writeAndSend(0,0,phi,T);
 
     std::cout << "Starting the solver..." << std::endl;
     solver.solve(phi, T, assembler, bcs_phi, bcs_T,

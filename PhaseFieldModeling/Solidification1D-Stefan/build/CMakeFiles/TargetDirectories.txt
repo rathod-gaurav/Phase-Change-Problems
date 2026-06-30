@@ -1,3 +1,0 @@
-/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/build/CMakeFiles/main.dir
-/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/build/CMakeFiles/edit_cache.dir
-/home/grathod/Downloads/Spring26/Lab/PhaseChangeProblems/PhaseFieldModeling/Solidification1D-Stefan/build/CMakeFiles/rebuild_cache.dir

@@ -12,7 +12,7 @@ class CoupledPhaseFieldSolver{
             const double epsilon,
             const double dt,
             const unsigned int NT,
-            const unsigned int maxIncr //in case incremental loading is required for dirischlet BCs
+            const unsigned int incrSteps //in case incremental loading is required for dirischlet BCs
         );
 
         void solve(
@@ -29,7 +29,7 @@ class CoupledPhaseFieldSolver{
         const double epsilon_;
         const double dt_;
         const unsigned int NT_;
-        const unsigned int maxIncr_;
+        const unsigned int incrSteps_;
 };
 
 #include "Solver.tpp"
