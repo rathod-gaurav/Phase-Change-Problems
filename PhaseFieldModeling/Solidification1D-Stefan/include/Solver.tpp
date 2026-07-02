@@ -26,15 +26,18 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
     const BoundaryConditions<Nsd,Nne>& bcs_T,
     std::function<void(unsigned int, double, const Eigen::VectorXd&, const Eigen::VectorXd&)> iterCallback //optional callback function for monitoring
 ){
-    Eigen::MatrixXd Mphi, MphiUU, MphiUD;
-    Eigen::MatrixXd Kphi, KphiUU, KphiUD;
-    Eigen::VectorXd Rphi, RphiU;
-    Eigen::MatrixXd MT, MTUU, MTUD;
-    Eigen::MatrixXd KT, KTUU, KTUD;
-    Eigen::VectorXd RT, RTU;
+    Eigen::MatrixXd Mphi;
+    Eigen::MatrixXd Kphi;
+    Eigen::VectorXd Rphi;
+    Eigen::MatrixXd MT;
+    Eigen::MatrixXd KT;
+    Eigen::VectorXd RT;
 
-    Eigen::VectorXd phiU, phi_np1U, phi_np1; 
-    Eigen::VectorXd TU, T_np1U, T_np1;
+    Eigen::VectorXd phi_np1U, phi_np1; 
+    Eigen::VectorXd T_np1U, T_np1;
+
+    Eigen::MatrixXd LHS_phiUU, LHS_phiUD, LHS_TUU, LHS_TUD;
+    Eigen::VectorXd RHS_phiU, RHS_TU;
     
     double t = dt_;
     for(unsigned int timestep = 1 ; timestep < NT_ ; timestep++){
@@ -48,6 +51,7 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
         
         //Phase field equation
         bcs_phi.applyDirischletToSolution(phi,incrFraction);
+        bcs_T.applyDirischletToSolution(T,incrFraction);
 
         assembler.assembleSystem_phi(
             Mphi,
@@ -55,12 +59,12 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
             Rphi
         );
 
-        assembler.partition(Mphi, Kphi, Rphi, phi, bcs_phi, MphiUU, MphiUD, KphiUU, KphiUD, RphiU, phiU);
-        
-        Eigen::MatrixXd LHS_phi = tau_*epsilon_*epsilon_*MphiUU + dt_*epsilon_*epsilon_*KphiUU;
-        Eigen::VectorXd RHS_phi = tau_*epsilon_*epsilon_*MphiUU*phiU + dt_*RphiU;
+        Eigen::MatrixXd LHS_phi = tau_*epsilon_*epsilon_*Mphi + dt_*epsilon_*epsilon_*Kphi;
+        Eigen::VectorXd RHS_phi = tau_*epsilon_*epsilon_*Mphi*phi + dt_*Rphi;
 
-        phi_np1U = LHS_phi.fullPivLu().solve(RHS_phi);
+        assembler.partition(LHS_phi, RHS_phi, bcs_phi, LHS_phiUU, LHS_phiUD, RHS_phiU);
+
+        phi_np1U = LHS_phiUU.fullPivLu().solve(RHS_phiU);
         phi_np1.resize(phi.size());
         const auto& unknownIndexes_phi = bcs_phi.getUnknownIndexes();
         for(unsigned int i = 0 ; i < unknownIndexes_phi.size() ; i++){
@@ -70,7 +74,6 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
         // phi_np1 = phi;
 
         //Temperature equation
-        bcs_T.applyDirischletToSolution(T,incrFraction);
 
         assembler.assembleSystem_T(
             MT,
@@ -80,11 +83,12 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
             dt_
         );
 
-        assembler.partition(MT, KT, RT, T, bcs_T, MTUU, MTUD, KTUU, KTUD, RTU, TU);
+        Eigen::MatrixXd LHS_T = MT + dt_*KT;
+        Eigen::VectorXd RHS_T = MT*T + dt_*RT;
 
-        Eigen::MatrixXd LHS_T = MTUU + dt_*KTUU;
-        Eigen::VectorXd RHS_T = MTUU*TU + dt_*RTU;
-        T_np1U = LHS_T.fullPivLu().solve(RHS_T);
+        assembler.partition(LHS_T, RHS_T, bcs_T, LHS_TUU, LHS_TUD, RHS_TU);
+
+        T_np1U = LHS_TUU.fullPivLu().solve(RHS_TU);
         T_np1.resize(T.size());
         const auto& unknownIndexes_T = bcs_T.getUnknownIndexes();
         for(unsigned int i = 0 ; i < unknownIndexes_T.size() ; i++){

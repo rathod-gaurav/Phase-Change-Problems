@@ -102,30 +102,21 @@ void Assembler<Nsd,Nne,BfOrder>::assembleSystem_T(
 
 template <unsigned int Nsd, unsigned int Nne, unsigned int BfOrder>
 void Assembler<Nsd,Nne,BfOrder>::partition(
-    Eigen::MatrixXd& M,
-    Eigen::MatrixXd& K,
-    Eigen::VectorXd& R,
-    Eigen::VectorXd& solution,
+    Eigen::MatrixXd& LHS,
+    Eigen::VectorXd& RHS,
     const BoundaryConditions<Nsd,Nne>& bcs,
-    Eigen::MatrixXd& MUU,
-    Eigen::MatrixXd& MUD,
-    Eigen::MatrixXd& KUU,
-    Eigen::MatrixXd& KUD,
-    Eigen::VectorXd& RU,
-    Eigen::VectorXd& solutionU
+    Eigen::MatrixXd& LHSUU,
+    Eigen::MatrixXd& LHSUD,
+    Eigen::VectorXd& RHSU
 ) const{
     const auto& dirischletIndexes = bcs.getDirischletIndexes();
     const auto& unknownIndexes = bcs.getUnknownIndexes();
 
-    MUU = extractSubmatrix(M, unknownIndexes, unknownIndexes);
-    MUD = extractSubmatrix(M, unknownIndexes, dirischletIndexes);
-    KUU = extractSubmatrix(K, unknownIndexes, unknownIndexes);
-    KUD = extractSubmatrix(K, unknownIndexes, dirischletIndexes);
+    LHSUU = extractSubmatrix(LHS, unknownIndexes, unknownIndexes);
+    LHSUD = extractSubmatrix(LHS, unknownIndexes, dirischletIndexes);
 
-    RU.resize(unknownIndexes.size());
-    solutionU.resize(unknownIndexes.size());
+    RHSU.resize(unknownIndexes.size());
     for(unsigned int i = 0 ; i < unknownIndexes.size() ; i++){
-        RU(i) = R(unknownIndexes[i]);
-        solutionU(i) = solution(unknownIndexes[i]);
+        RHSU(i) = RHS(unknownIndexes[i]);
     }
 }

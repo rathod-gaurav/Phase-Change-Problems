@@ -28,17 +28,12 @@ class Assembler{
         ) const;
 
         void partition(
-            Eigen::MatrixXd& M,
-            Eigen::MatrixXd& K,
-            Eigen::VectorXd& R,
-            Eigen::VectorXd& solution,
+            Eigen::MatrixXd& LHS,
+            Eigen::VectorXd& RHS,
             const BoundaryConditions<Nsd,Nne>& bcs,
-            Eigen::MatrixXd& MUU,
-            Eigen::MatrixXd& MUD,
-            Eigen::MatrixXd& KUU,
-            Eigen::MatrixXd& KUD,
-            Eigen::VectorXd& RU,
-            Eigen::VectorXd& solutionU
+            Eigen::MatrixXd& LHSUU,
+            Eigen::MatrixXd& LHSUD,
+            Eigen::VectorXd& RHSU
         ) const;
     
     private:

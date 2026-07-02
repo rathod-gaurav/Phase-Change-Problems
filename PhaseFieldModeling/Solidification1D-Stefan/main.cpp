@@ -104,7 +104,7 @@ int main(){
     //Initialize the phi and T global vectors
     Eigen::VectorXd phi = Eigen::VectorXd::Zero(mesh.Nnodes());
     Eigen::VectorXd T = Eigen::VectorXd::Zero(mesh.Nnodes());
-    double X0 = 0.01;
+    double X0 = 0.008;
     for(unsigned int i = 0 ; i < mesh.Nnodes() ; i++){
         phi(i) = 0.5*(1 - std::tanh((mesh.nodes[i].x1 - X0)/delta));
         T(i) = Tm;
