@@ -38,20 +38,14 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
 
     Eigen::MatrixXd LHS_phiUU, LHS_phiUD, LHS_TUU, LHS_TUD;
     Eigen::VectorXd RHS_phiU, RHS_TU;
-    
+
+    double incrFraction = 1.0;
+    bcs_phi.applyDirischletToSolution(phi,incrFraction);
+    bcs_T.applyDirischletToSolution(T,incrFraction);    
+
     double t = dt_;
-    for(unsigned int timestep = 1 ; timestep < NT_ ; timestep++){
-        double incrFraction = 1.0;
-        // if(timestep <= incrSteps_){
-        //     incrFraction = incrSteps_ - timestep;
-        // }
-        // else{
-        //     incrFraction = incrSteps_;
-        // }
-        
+    for(unsigned int timestep = 1 ; timestep < NT_ ; timestep++){        
         //Phase field equation
-        bcs_phi.applyDirischletToSolution(phi,incrFraction);
-        bcs_T.applyDirischletToSolution(T,incrFraction);
 
         assembler.assembleSystem_phi(
             Mphi,
@@ -87,6 +81,13 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
         Eigen::VectorXd RHS_T = MT*T + dt_*RT;
 
         assembler.partition(LHS_T, RHS_T, bcs_T, LHS_TUU, LHS_TUD, RHS_TU);
+        // std::cout << "-----------------------" << std::endl;
+        // std::cout << LHS_T.size() << std::endl;
+        // std::cout << LHS_TUU.size() << std::endl;
+        // std::cout << LHS_TUD.size() << std::endl;
+        // std::cout << RHS_T.size() << std::endl;
+        // std::cout << RHS_TU.size() << std::endl;
+        // std::cout << "-----------------------" << std::endl;
 
         T_np1U = LHS_TUU.fullPivLu().solve(RHS_TU);
         T_np1.resize(T.size());

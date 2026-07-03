@@ -68,6 +68,18 @@ void BoundaryConditions<Nsd,Nne>::applyNeumannToForceVector(Eigen::VectorXd& for
 };
 
 template <unsigned int Nsd, unsigned int Nne>
+const Eigen::VectorXd BoundaryConditions<Nsd,Nne>::getDirischletValues() const {
+    Eigen::VectorXd dirischletValues(dirischletIndexes_.size());
+    unsigned int i = 0;
+    for(const auto& [dof,val] : dirischletVals_){
+        dirischletValues(i) = val;
+        i++;
+    }
+
+    return dirischletValues;
+}
+
+template <unsigned int Nsd, unsigned int Nne>
 void BoundaryConditions<Nsd,Nne>::printSummary() const{
     std::cout << "Boundary Conditions Summary:" << std::endl;
     std::cout << "Total DOFs: " << totalDOFs_ << std::endl;

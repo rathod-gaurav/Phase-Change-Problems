@@ -17,7 +17,7 @@ int main(){
     constexpr unsigned int Nne = 2;
 
     //Number of timesteps to solve for
-    unsigned int NT = 100;
+    unsigned int NT = 500;
     unsigned int incrSteps = 1;
 
     //Quadrature order
@@ -42,8 +42,8 @@ int main(){
     double epsilon = 4*1e-4;
     //Derived quantities
     double W = 2.0;
-    double delta = epsilon*sqrt(2/W);
-    double lambda = (5/8)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat;
+    double delta = epsilon*sqrt(2.0/W);
+    double lambda = (5.0/8.0)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat;
     double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat);
     double dt = 0.8*((tau*pow(epsilon,2))/W);
 
@@ -57,12 +57,12 @@ int main(){
 
     //Mesh
     double x1_ll = 0.0, x1_ul = 0.01;
-    double Nel_x1 = 100;
+    double Nel_x1 = 200;
     double h = (x1_ul - x1_ll)/Nel_x1;
     std::cout << "Mesh size h: " << h << std::endl;
     std::cout << "Delta: " << delta << std::endl;
     std::cout << "Timestep size dt: " << dt << std::endl;
-    if(delta < 4*h){
+    if(delta < 5*h){
         throw std::runtime_error("Delta condition not satisfied. Mesh is too coarse for the given epsilon. Please refine the mesh.");
     }
 

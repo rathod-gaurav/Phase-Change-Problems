@@ -119,4 +119,8 @@ void Assembler<Nsd,Nne,BfOrder>::partition(
     for(unsigned int i = 0 ; i < unknownIndexes.size() ; i++){
         RHSU(i) = RHS(unknownIndexes[i]);
     }
+
+    //apply dirischlet
+    const auto& dirischletValues = bcs.getDirischletValues();
+    RHSU -= LHSUD*dirischletValues;
 }

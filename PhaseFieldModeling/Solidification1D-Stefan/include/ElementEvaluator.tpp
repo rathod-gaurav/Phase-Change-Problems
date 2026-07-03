@@ -97,12 +97,12 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement_phi(
 
                         double Mphi_AB = N_A * N_B * JacDet * weight;
                         double Kphi_AB = (JacInv*basis_gradient_vecA*JacInv*basis_gradient_vecB*JacDet*weight).value();
-                        Mphi_e(A,B) = Mphi_AB;
-                        Kphi_e(A,B) = Kphi_AB;
+                        Mphi_e(A,B) += Mphi_AB;
+                        Kphi_e(A,B) += Kphi_AB;
                     }
                     double Rphi_multiplier = -1*W_*gFuncDerivative_(phi_h) + lambda_*pFuncDerivative_(phi_h)*LatentHeat_*((T_h - Tm_)/Tm_);
                     double Rphi_A = Rphi_multiplier*ShapeFunction<Nsd,Nne,BfOrder>::basis_function(A,xi_vec)*JacDet*weight;
-                    Rphi_e(A) = Rphi_A;
+                    Rphi_e(A) += Rphi_A;
                 }
             }
         }
@@ -162,12 +162,12 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement_T(
 
                         double MT_AB = rho_*Cphi_(phi_np1_h)*N_A*N_B*JacDet*weight;
                         double KT_AB = (Kphi_(phi_np1_h)*JacInv*basis_gradient_vecA*JacInv*basis_gradient_vecB*JacDet*weight).value();
-                        MT_e(A,B) = MT_AB;
-                        KT_e(A,B) = KT_AB;
+                        MT_e(A,B) += MT_AB;
+                        KT_e(A,B) += KT_AB;
                     }
                     double RT_multiplier = rho_*LatentHeat_*pFuncDerivative_(phi_np1_h)*phi_np1_h_t;
                     double RT_A = RT_multiplier*ShapeFunction<Nsd,Nne,BfOrder>::basis_function(A, xi_vec)*JacDet*weight;
-                    RT_e(A) = RT_A;
+                    RT_e(A) += RT_A;
                 }
             }
         }

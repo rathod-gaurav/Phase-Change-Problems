@@ -19,10 +19,12 @@ class BoundaryConditions{
 
         void applyDirischletToSolution(Eigen::VectorXd& solution, double incrementFraction) const; //function to apply the boundary conditions to the solution vector u based on the current increment fraction (used for incremental loading)
         void applyNeumannToForceVector(Eigen::VectorXd& forceVector) const; //function to apply the neumann boundary conditions to the force vector
+        
         //Query methods
         const std::vector<unsigned int>& getUnknownIndexes() const { return unknownIndexes_; } //function to return indexes of the unknown degrees of freedom
         const std::vector<unsigned int>& getDirischletIndexes() const { return dirischletIndexes_; } //function to return the indexes of the dirischlet degrees of freedom
         const std::vector<unsigned int>& getNeumannIndexes() const { return neumannIndexes_; } //function to return the indexes of the neumann degrees of freedom
+        const Eigen::VectorXd getDirischletValues() const;
 
         bool isDirischlet(unsigned int globalDOF) const {return isDirischlet_[globalDOF];} //function to check if a given global degree of freedom is subject to dirischlet boundary conditions
         bool isNeumann(unsigned int globalDOF) const {return isNeumann_[globalDOF];} //function to check if a given global degree of freedom is subject to neumann boundary conditions
