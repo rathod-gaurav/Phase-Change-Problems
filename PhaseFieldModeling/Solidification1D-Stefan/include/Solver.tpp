@@ -81,13 +81,6 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
         Eigen::VectorXd RHS_T = MT*T + dt_*RT;
 
         assembler.partition(LHS_T, RHS_T, bcs_T, LHS_TUU, LHS_TUD, RHS_TU);
-        // std::cout << "-----------------------" << std::endl;
-        // std::cout << LHS_T.size() << std::endl;
-        // std::cout << LHS_TUU.size() << std::endl;
-        // std::cout << LHS_TUD.size() << std::endl;
-        // std::cout << RHS_T.size() << std::endl;
-        // std::cout << RHS_TU.size() << std::endl;
-        // std::cout << "-----------------------" << std::endl;
 
         T_np1U = LHS_TUU.fullPivLu().solve(RHS_TU);
         T_np1.resize(T.size());

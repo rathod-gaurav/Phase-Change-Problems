@@ -17,7 +17,7 @@ int main(){
     constexpr unsigned int Nne = 2;
 
     //Number of timesteps to solve for
-    unsigned int NT = 500;
+    unsigned int NT = 100;
     unsigned int incrSteps = 1;
 
     //Quadrature order
@@ -39,9 +39,9 @@ int main(){
     double mu = 1e-2; //m/s-K
 
     //Assumptions
-    double epsilon = 4*1e-4;
+    double epsilon = 5*1e-4;
     //Derived quantities
-    double W = 2.0;
+    double W = (18*sigma*sigma)/(epsilon*epsilon);
     double delta = epsilon*sqrt(2.0/W);
     double lambda = (5.0/8.0)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat;
     double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat);
@@ -57,7 +57,7 @@ int main(){
 
     //Mesh
     double x1_ll = 0.0, x1_ul = 0.01;
-    double Nel_x1 = 200;
+    double Nel_x1 = 10000;
     double h = (x1_ul - x1_ll)/Nel_x1;
     std::cout << "Mesh size h: " << h << std::endl;
     std::cout << "Delta: " << delta << std::endl;
@@ -104,7 +104,7 @@ int main(){
     //Initialize the phi and T global vectors
     Eigen::VectorXd phi = Eigen::VectorXd::Zero(mesh.Nnodes());
     Eigen::VectorXd T = Eigen::VectorXd::Zero(mesh.Nnodes());
-    double X0 = 0.008;
+    double X0 = 0.01;
     for(unsigned int i = 0 ; i < mesh.Nnodes() ; i++){
         phi(i) = 0.5*(1 - std::tanh((mesh.nodes[i].x1 - X0)/delta));
         T(i) = Tm;
