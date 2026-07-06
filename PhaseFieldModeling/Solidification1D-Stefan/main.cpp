@@ -17,7 +17,7 @@ int main(){
     constexpr unsigned int Nne = 2;
 
     //Number of timesteps to solve for
-    unsigned int NT = 100;
+    unsigned int NT = 10;
     unsigned int incrSteps = 1;
 
     //Quadrature order
@@ -26,26 +26,35 @@ int main(){
     std::cout << "Solving " << Nsd << "D problem with " << Nne << " node elements and " << BfOrder << " order basis functions." << std::endl;
 
     //Problem parameters
-    double rho = 1000.0; //Kg/m3
-    double Cs = 2000.0; //J/Kg-K
-    double Cl = 4000.0; //J/Kg-K 
-    double Ks = 2.0; //W/m-K
-    double Kl = 0.6; //W/m-K
-    double LatentHeat = 1e5; //J/Kg
-    double Tm = 273.0; //K
-    double Tcold = 263.0; //K
+    double rho = 917.0; //Kg/m3
+    double Cs = 2090.0; //J/Kg-K
+    double Cl = 4186.0; //J/Kg-K 
+    double Ks = 2.22; //W/m-K
+    double Kl = 0.556; //W/m-K
+    double LatentHeat = 334000.0; //J/Kg
+    double Tm = 273.15; //K
+    double Tcold = 263.15; //K
 
-    double sigma = 0.01; //J/m2
-    double mu = 1e-2; //m/s-K
+    double sigma = 0.033; //J/m2
+    double mu = 1e-4; //m/s-K
 
     //Assumptions
-    double epsilon = 5*1e-4;
+    double epsilon = 2.5*1e-4;
     //Derived quantities
-    double W = (18*sigma*sigma)/(epsilon*epsilon);
+    double W = 1.0;
     double delta = epsilon*sqrt(2.0/W);
     double lambda = (5.0/8.0)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat;
     double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat);
-    double dt = 0.8*((tau*pow(epsilon,2))/W);
+    double dt = 0.032;
+
+    std::cout << "----------------------" << std::endl;
+    std::cout << "Problem parameters:" << std::endl;
+    std::cout << "W: " << W << std::endl;
+    std::cout << "Delta: " << delta << std::endl;
+    std::cout << "Lambda: " << lambda << std::endl;
+    std::cout << "Tau: " << tau << std::endl;
+    std::cout << "Timestep size dt: " << dt << std::endl;
+    std::cout << "----------------------" << std::endl;
 
     //PhaseField Model functions
     auto gFunc = [](double phi){ return phi*phi*(1 - phi)*(1 - phi); };
@@ -57,7 +66,7 @@ int main(){
 
     //Mesh
     double x1_ll = 0.0, x1_ul = 0.01;
-    double Nel_x1 = 10000;
+    double Nel_x1 = 200;
     double h = (x1_ul - x1_ll)/Nel_x1;
     std::cout << "Mesh size h: " << h << std::endl;
     std::cout << "Delta: " << delta << std::endl;
@@ -104,7 +113,7 @@ int main(){
     //Initialize the phi and T global vectors
     Eigen::VectorXd phi = Eigen::VectorXd::Zero(mesh.Nnodes());
     Eigen::VectorXd T = Eigen::VectorXd::Zero(mesh.Nnodes());
-    double X0 = 0.01;
+    double X0 = 0.007;
     for(unsigned int i = 0 ; i < mesh.Nnodes() ; i++){
         phi(i) = 0.5*(1 - std::tanh((mesh.nodes[i].x1 - X0)/delta));
         T(i) = Tm;
