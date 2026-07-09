@@ -35,6 +35,10 @@ class Assembler{
             Eigen::MatrixXd& LHSUD,
             Eigen::VectorXd& RHSU
         ) const;
+
+        void make_lumped(
+            Eigen::MatrixXd& M
+        ) const;
     
     private:
         Eigen::MatrixXd extractSubmatrix(

@@ -138,15 +138,15 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement_T(
 
                 VectorNsd xi_vec(xi1);
 
-                double phi_np1_h = 0.0;
-                double phi_np1_h_t = 0.0;
+                double phi_h = 0.0;
+                double phi_h_t = 0.0;
 
                 for(unsigned int A = 0 ; A < Nne ; A++){
                     unsigned int globalNodeIndex = mesh_.elements[e].node[A];
-                    phi_np1_h += ShapeFunction<Nsd,Nne,BfOrder>::basis_function(A, xi_vec)*phi_np1[globalNodeIndex];
+                    phi_h += ShapeFunction<Nsd,Nne,BfOrder>::basis_function(A, xi_vec)*phi_[globalNodeIndex];
 
                     double phi_t = (phi_np1[globalNodeIndex] - phi_[globalNodeIndex])/dt;
-                    phi_np1_h_t += ShapeFunction<Nsd,Nne,BfOrder>::basis_function(A, xi_vec)*phi_t;
+                    phi_h_t += ShapeFunction<Nsd,Nne,BfOrder>::basis_function(A, xi_vec)*phi_t;
                 }
 
                 MatrixNsd Jac = computeJacobian(e, xi_vec);
@@ -160,12 +160,12 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement_T(
                         VectorNsd basis_gradient_vecA = ShapeFunction<Nsd,Nne,BfOrder>::basis_gradient(A, xi_vec);
                         VectorNsd basis_gradient_vecB = ShapeFunction<Nsd,Nne,BfOrder>::basis_gradient(B, xi_vec);
 
-                        double MT_AB = rho_*Cphi_(phi_np1_h)*N_A*N_B*JacDet*weight;
-                        double KT_AB = (Kphi_(phi_np1_h)*JacInv*basis_gradient_vecA*JacInv*basis_gradient_vecB*JacDet*weight).value();
+                        double MT_AB = rho_*Cphi_(phi_h)*N_A*N_B*JacDet*weight;
+                        double KT_AB = (Kphi_(phi_h)*JacInv*basis_gradient_vecA*JacInv*basis_gradient_vecB*JacDet*weight).value();
                         MT_e(A,B) += MT_AB;
                         KT_e(A,B) += KT_AB;
                     }
-                    double RT_multiplier = rho_*LatentHeat_*pFuncDerivative_(phi_np1_h)*phi_np1_h_t;
+                    double RT_multiplier = rho_*LatentHeat_*pFuncDerivative_(phi_h)*phi_h_t;
                     double RT_A = RT_multiplier*ShapeFunction<Nsd,Nne,BfOrder>::basis_function(A, xi_vec)*JacDet*weight;
                     RT_e(A) += RT_A;
                 }

@@ -53,10 +53,11 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
             Rphi
         );
 
-        Eigen::MatrixXd LHS_phi = tau_*epsilon_*epsilon_*Mphi + dt_*epsilon_*epsilon_*Kphi;
-        Eigen::VectorXd RHS_phi = tau_*epsilon_*epsilon_*Mphi*phi + dt_*Rphi;
+        Eigen::MatrixXd LHS_phi = tau_*epsilon_*epsilon_*Mphi;
+        Eigen::VectorXd RHS_phi = (tau_*epsilon_*epsilon_*Mphi - dt_*epsilon_*epsilon_*Kphi)*phi + dt_*Rphi;
 
         assembler.partition(LHS_phi, RHS_phi, bcs_phi, LHS_phiUU, LHS_phiUD, RHS_phiU);
+        assembler.make_lumped(LHS_phi);
 
         phi_np1U = LHS_phiUU.fullPivLu().solve(RHS_phiU);
         phi_np1.resize(phi.size());
@@ -77,8 +78,8 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
             dt_
         );
 
-        Eigen::MatrixXd LHS_T = MT + dt_*KT;
-        Eigen::VectorXd RHS_T = MT*T + dt_*RT;
+        Eigen::MatrixXd LHS_T = MT;
+        Eigen::VectorXd RHS_T = (MT - dt_*KT)*T + dt_*RT;
 
         assembler.partition(LHS_T, RHS_T, bcs_T, LHS_TUU, LHS_TUD, RHS_TU);
 

@@ -124,3 +124,20 @@ void Assembler<Nsd,Nne,BfOrder>::partition(
     const auto& dirischletValues = bcs.getDirischletValues();
     RHSU -= LHSUD*dirischletValues;
 }
+
+template <unsigned int Nsd, unsigned int Nne, unsigned int BfOrder>
+void Assembler<Nsd,Nne,BfOrder>::make_lumped(
+    Eigen::MatrixXd& M
+) const {
+    unsigned int rows = M.rows();
+    unsigned int cols = M.cols();
+
+    for (unsigned int row = 0 ; row < rows ; row++){
+        double val = 0.0;
+        for(unsigned int col = 0 ; col < cols ; col++){
+            val += M(row,col); 
+            M(row,col) = 0.0;
+        }
+        M(row,row) = val;
+    }
+}
