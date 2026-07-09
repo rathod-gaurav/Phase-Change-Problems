@@ -7,10 +7,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Include headers
 include_directories("include")
-include_directories("/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0") #include Eigen headers
-# include_directories("/mnt/c/Users/ratho/Downloads/eigen-5.0.0/eigen-5.0.0") #include Eigen headers
-
-# include_directories("/mnt/c/Users/ratho/Downloads/eigen-5.0.0/eigen-5.0.0") #include Eigen headers
+# include_directories("/home/grathod/Downloads/eigen-5.0.0/eigen-5.0.0") #include Eigen headers
+include_directories("/mnt/c/Users/ratho/Downloads/eigen-5.0.0/eigen-5.0.0") #include Eigen headers
 
 # Gather all source files
 file(GLOB SOURCES "src/*.cpp")
