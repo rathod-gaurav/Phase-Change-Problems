@@ -49,14 +49,14 @@ int main(){
     double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat);
     double dt = 0.001;
 
-    std::cout << "----------------------" << std::endl;
-    std::cout << "Problem parameters:" << std::endl;
-    std::cout << "W: " << W << std::endl;
-    std::cout << "Delta: " << delta << std::endl;
-    std::cout << "Lambda: " << lambda << std::endl;
-    std::cout << "Tau: " << tau << std::endl;
-    std::cout << "Timestep size dt: " << dt << std::endl;
-    std::cout << "----------------------" << std::endl;
+    // std::cout << "----------------------" << std::endl;
+    // std::cout << "Problem parameters:" << std::endl;
+    // std::cout << "W: " << W << std::endl;
+    // std::cout << "Delta: " << delta << std::endl;
+    // std::cout << "Lambda: " << lambda << std::endl;
+    // std::cout << "Tau: " << tau << std::endl;
+    // std::cout << "Timestep size dt: " << dt << std::endl;
+    // std::cout << "----------------------" << std::endl;
 
     //PhaseField Model functions
     auto gFunc = [](double phi){ return phi*phi*(1 - phi)*(1 - phi); };
@@ -80,13 +80,6 @@ int main(){
     if(delta < 5*h){
         throw std::runtime_error("Delta condition not satisfied. Mesh is too coarse for the given epsilon. Please refine the mesh.");
     }
-
-    std::cout << "----------------------" << std::endl;
-    std::cout << "CFL parameters:" << std::endl;
-    std::cout << "CFL for phi: dt < " << tau*h*h*0.5 << std::endl;
-    std::cout << "Reaction stability for phi: dt < " << (tau*epsilon*epsilon)/W << std::endl;
-    std::cout << "Diffusion CFL for T: dt < " << (rho*Cs*h*h)/(2*Ks) << std::endl;
-    std::cout << "----------------------" << std::endl;
 
     //Mesh generation
     MeshGenerator<Nsd, Nne, BfOrder> meshGen(x1_ll, x1_ul, Nel_x1);
