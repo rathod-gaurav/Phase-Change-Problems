@@ -17,9 +17,9 @@ int main(){
     constexpr unsigned int Nne = 2;
 
     //Number of timesteps to solve for
-    unsigned int NT = 20;
+    unsigned int NT = 200;
     unsigned int incrSteps = 1;
-    unsigned int maxIter = 10; //maximum number of allowed iterations for Newton-Raphson
+    unsigned int maxIter = 20; //maximum number of allowed iterations for Newton-Raphson
     double epsilon_NR = 1e-3; //convergence criteria for Newton-Raphson 
 
     //Quadrature order
@@ -38,7 +38,7 @@ int main(){
     double Tcold = 263.15; //K
 
     double sigma = 0.033; //J/m2
-    double mu = 1e-4; //m/s-K
+    double mu = 1e-8; //m/s-K
 
     //Assumptions
     double epsilon = 5*1e-4;
@@ -47,16 +47,16 @@ int main(){
     double delta = epsilon*sqrt(2.0/W);
     double lambda = (5.0/8.0)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat;
     double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat);
-    double dt = 0.001;
+    double dt = 0.1;
 
-    // std::cout << "----------------------" << std::endl;
-    // std::cout << "Problem parameters:" << std::endl;
-    // std::cout << "W: " << W << std::endl;
-    // std::cout << "Delta: " << delta << std::endl;
-    // std::cout << "Lambda: " << lambda << std::endl;
-    // std::cout << "Tau: " << tau << std::endl;
-    // std::cout << "Timestep size dt: " << dt << std::endl;
-    // std::cout << "----------------------" << std::endl;
+    std::cout << "----------------------" << std::endl;
+    std::cout << "Problem parameters:" << std::endl;
+    std::cout << "W: " << W << std::endl;
+    std::cout << "Delta: " << delta << std::endl;
+    std::cout << "Lambda: " << lambda << std::endl;
+    std::cout << "Tau: " << tau << std::endl;
+    std::cout << "Timestep size dt: " << dt << std::endl;
+    std::cout << "----------------------" << std::endl;
 
     //PhaseField Model functions
     auto gFunc = [](double phi){ return phi*phi*(1 - phi)*(1 - phi); };
@@ -119,9 +119,9 @@ int main(){
     //Initialize the phi and T global vectors
     Eigen::VectorXd phi = Eigen::VectorXd::Zero(mesh.Nnodes());
     Eigen::VectorXd T = Eigen::VectorXd::Zero(mesh.Nnodes());
-    double X0 = 0.008;
+    double X0 = 0.007;
     for(unsigned int i = 0 ; i < mesh.Nnodes() ; i++){
-        phi(i) = 0.5*(1 - std::tanh((mesh.nodes[i].x1 - X0)/delta));
+        phi(i) = 0.5*(1 - std::tanh((mesh.nodes[i].x1 - X0)/(delta)));
         T(i) = Tm;
     }
 

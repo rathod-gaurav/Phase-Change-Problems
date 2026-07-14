@@ -79,6 +79,7 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
             );
 
             G_T = (1/dt_)*MT*(T_k - T) + KT*T_k - RT;
+            // std::cout << "G(100): " << G_T(100) << std::endl;
             G_T(100) = 0.0;
 
             double error = G_phi.norm() + G_T.norm();
