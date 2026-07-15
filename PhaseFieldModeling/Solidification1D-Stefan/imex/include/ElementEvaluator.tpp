@@ -167,7 +167,7 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement_T(
                     }
                     double RT_multiplier = rho_*LatentHeat_*pFuncDerivative_(phi_np1_h)*phi_np1_h_t;
                     double RT_A = RT_multiplier*ShapeFunction<Nsd,Nne,BfOrder>::basis_function(A, xi_vec)*JacDet*weight;
-                    RT_e(A) += RT_A;
+                    RT_e(A) -= RT_A;
                 }
             }
         }
