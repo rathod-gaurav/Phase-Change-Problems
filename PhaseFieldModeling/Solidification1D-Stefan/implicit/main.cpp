@@ -19,8 +19,8 @@ int main(){
     //Number of timesteps to solve for
     unsigned int NT = 2000;
     unsigned int incrSteps = 1;
-    unsigned int maxIter = 50; //maximum number of allowed iterations for Newton-Raphson
-    double epsilon_NR = 1e-3; //convergence criteria for Newton-Raphson 
+    unsigned int maxIter = 100; //maximum number of allowed iterations for Newton-Raphson
+    double epsilon_NR = 1e-6; //convergence criteria for Newton-Raphson 
 
     //Quadrature order
     unsigned int quadOrder = 2;
@@ -41,13 +41,13 @@ int main(){
     double mu = 1e-8; //m/s-K
 
     //Assumptions
-    double epsilon = 5*1e-4;
+    double epsilon = 1e-4;
     //Derived quantities
-    double W = 0.5;
+    double W = 0.2;
     double delta = epsilon*sqrt(2.0/W);
     double lambda = (5.0/8.0)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat;
     double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat);
-    double dt = 0.2;
+    double dt = 0.01;
 
     std::cout << "----------------------" << std::endl;
     std::cout << "Problem parameters:" << std::endl;
@@ -72,7 +72,7 @@ int main(){
 
     //Mesh
     double x1_ll = 0.0, x1_ul = 0.01;
-    double Nel_x1 = 100;
+    double Nel_x1 = 500;
     double h = (x1_ul - x1_ll)/Nel_x1;
     std::cout << "Mesh size h: " << h << std::endl;
     std::cout << "Delta: " << delta << std::endl;
@@ -119,7 +119,7 @@ int main(){
     //Initialize the phi and T global vectors
     Eigen::VectorXd phi = Eigen::VectorXd::Zero(mesh.Nnodes());
     Eigen::VectorXd T = Eigen::VectorXd::Zero(mesh.Nnodes());
-    double X0 = 0.007;
+    double X0 = 0.009;
     for(unsigned int i = 0 ; i < mesh.Nnodes() ; i++){
         phi(i) = 0.5*(1 - std::tanh((mesh.nodes[i].x1 - X0)/(delta)));
         T(i) = Tm;

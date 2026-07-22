@@ -51,10 +51,43 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
     phi_k = phi;
     T_k = T;
     double t = dt_;
-    for(unsigned int timestep = 1 ; timestep < NT_ ; timestep++){        
+    for(unsigned int timestep = 1 ; timestep < NT_ ; timestep++){     
+        
+        assembler.assembleSystem_phi(
+            Mphi,
+            Kphi,
+            Rphi,
+            phi_k,
+            T_k,
+            Dphiphi,
+            DphiT
+        );
+
+        G_phi = ((tau_*epsilon_*epsilon_)/dt_)*Mphi*(phi_k - phi) + epsilon_*epsilon_*Kphi*phi_k - Rphi;
+
+        assembler.assembleSystem_T(
+            MT,
+            KT,
+            RT,
+            phi_k,
+            T_k,
+            dt_,
+            DTphi
+        );
+
+        G_T = (1/dt_)*MT*(T_k - T) + KT*T_k - RT;
+        const auto& dirischletIndexes = bcs_T.getDirischletIndexes();
+        for(unsigned int i = 0 ; i < dirischletIndexes.size() ; i++){
+            G_T(dirischletIndexes[i]) = 0.0;
+        }
+
+        double phi_error_0 = G_phi.norm();
+        double T_error_0 = G_T.norm();
+        if(phi_error_0 < 1e-14) phi_error_0 = 1.0;
+        if(T_error_0   < 1e-14) T_error_0   = 1.0; 
         
         //start newton raphson iterations
-        for(unsigned int k = 1 ; k < maxIter_ ; k++){
+        for(unsigned int k = 0 ; k < maxIter_ ; k++){
 
             assembler.assembleSystem_phi(
                 Mphi,
@@ -79,13 +112,16 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
             );
 
             G_T = (1/dt_)*MT*(T_k - T) + KT*T_k - RT;
-            // std::cout << "G(100): " << G_T(100) << std::endl;
-            G_T(100) = 0.0;
+            const auto& dirischletIndexes = bcs_T.getDirischletIndexes();
+            for(unsigned int i = 0 ; i < dirischletIndexes.size() ; i++){
+                G_T(dirischletIndexes[i]) = 0.0;
+            }
 
-            double error = G_phi.norm() + G_T.norm();
-            std::cout << "timestep: " << timestep << " | iteration: " << k << " | error: " << error << std::endl;
+            double phi_error = G_phi.norm()/phi_error_0;
+            double T_error = G_T.norm()/T_error_0;
+            std::cout << "timestep: " << timestep << " | iteration: " << k << " | phi_error: " << phi_error << " | T_error: " << T_error << std::endl;
 
-            if(error < epsilon_NR_){
+            if(phi_error < epsilon_NR_ && T_error < epsilon_NR_){
                 phi = phi_k;
                 T = T_k;
                 std::cout << "convergence achieved for timestep " << timestep << " in " << k << " iterations" << std::endl;
@@ -98,15 +134,19 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
                 J_TT = (1/dt_)*MT + KT;
 
                 //apply dirischlet boundary conditions
-                const auto& dirischletIndexes = bcs_T.getDirischletIndexes();
                 for(unsigned int i = 0 ; i < dirischletIndexes.size() ; i++){
                     J_phiT.col(dirischletIndexes[i]).setZero();
                     J_Tphi.row(dirischletIndexes[i]).setZero();
                     J_TT.col(dirischletIndexes[i]).setZero();
                     J_TT.row(dirischletIndexes[i]).setZero();
                     J_TT(dirischletIndexes[i],dirischletIndexes[i]) = 1.0;
-                    // G_T(dirischletIndexes[i]) = 0.0;
                 }
+
+                // Check J_Tphi norm — should be nonzero if assembled correctly
+                std::cout << "||J_Tphi|| = " << J_Tphi.norm() << std::endl;
+                std::cout << "||J_phiT|| = " << J_phiT.norm() << std::endl;
+                std::cout << "||J_phiphi|| = " << J_phiphi.norm() << std::endl;
+                std::cout << "||J_TT|| = " << J_TT.norm() << std::endl;
 
                 unsigned int Nt = phi_k.size();
                 Jacobian.resize(2*Nt,2*Nt);
@@ -132,8 +172,8 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
             }
         }
 
-        phi = phi_k;
-        T = T_k;
+        // phi = phi_k;
+        // T = T_k;
         
         if (iterCallback) {
             iterCallback(timestep, t, phi, T);
