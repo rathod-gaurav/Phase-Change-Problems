@@ -70,29 +70,29 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
 
         //Temperature equation
 
-        assembler.assembleSystem_T(
-            MT,
-            KT,
-            RT,
-            phi_np1,
-            dt_
-        );
+        // assembler.assembleSystem_T(
+        //     MT,
+        //     KT,
+        //     RT,
+        //     phi_np1,
+        //     dt_
+        // );
 
-        Eigen::MatrixXd LHS_T = MT;
-        Eigen::VectorXd RHS_T = (MT - dt_*KT)*T + dt_*RT;
+        // Eigen::MatrixXd LHS_T = MT;
+        // Eigen::VectorXd RHS_T = (MT - dt_*KT)*T + dt_*RT;
 
-        assembler.partition(LHS_T, RHS_T, bcs_T, LHS_TUU, LHS_TUD, RHS_TU);
+        // assembler.partition(LHS_T, RHS_T, bcs_T, LHS_TUU, LHS_TUD, RHS_TU);
 
-        T_np1U = LHS_TUU.fullPivLu().solve(RHS_TU);
-        T_np1.resize(T.size());
-        const auto& unknownIndexes_T = bcs_T.getUnknownIndexes();
-        for(unsigned int i = 0 ; i < unknownIndexes_T.size() ; i++){
-            T_np1(unknownIndexes_T[i]) = T_np1U[i];
-        }
-        bcs_T.applyDirischletToSolution(T_np1, incrFraction);
+        // T_np1U = LHS_TUU.fullPivLu().solve(RHS_TU);
+        // T_np1.resize(T.size());
+        // const auto& unknownIndexes_T = bcs_T.getUnknownIndexes();
+        // for(unsigned int i = 0 ; i < unknownIndexes_T.size() ; i++){
+        //     T_np1(unknownIndexes_T[i]) = T_np1U[i];
+        // }
+        // bcs_T.applyDirischletToSolution(T_np1, incrFraction);
 
         phi = phi_np1;
-        T = T_np1;
+        // T = T_np1;
 
         if (iterCallback) {
             iterCallback(timestep, t, phi, T);
