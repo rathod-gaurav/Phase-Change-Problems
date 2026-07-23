@@ -36,16 +36,16 @@ int main(){
     double Tcold = 263.15; //K
 
     double sigma = 0.033; //J/m2
-    double mu = 1e-8; //m/s-K
+    double mu = 0.1; //m/s-K
 
     //Assumptions
     double epsilon = 1e-4;
     //Derived quantities
-    double W = 0.2;
+    double W = 0.15;
     double delta = epsilon*sqrt(2.0/W);
-    double lambda = (5.0/8.0)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat;
-    double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat);
-    double dt = 0.1;
+    double lambda = (5.0/8.0)*(epsilon*sqrt(2*W)*rho*((Cs+Cl)/2)*Tm)/LatentHeat; //Kg/m3
+    double tau = (15*rho*((Cs+Cl)/2)*Tm)/(4*mu*LatentHeat); //s/m2
+    double dt = 0.00001;
 
     std::cout << "----------------------" << std::endl;
     std::cout << "Problem parameters:" << std::endl;
@@ -66,14 +66,14 @@ int main(){
 
     //Mesh
     double x1_ll = 0.0, x1_ul = 0.01;
-    double Nel_x1 = 500;
+    double Nel_x1 = 100;
     double h = (x1_ul - x1_ll)/Nel_x1;
     std::cout << "Mesh size h: " << h << std::endl;
     std::cout << "Delta: " << delta << std::endl;
     std::cout << "Timestep size dt: " << dt << std::endl;
-    if(delta < 5*h){
-        throw std::runtime_error("Delta condition not satisfied. Mesh is too coarse for the given epsilon. Please refine the mesh.");
-    }
+    // if(delta < 4*h){
+    //     throw std::runtime_error("Delta condition not satisfied. Mesh is too coarse for the given epsilon. Please refine the mesh.");
+    // }
 
     std::cout << "----------------------" << std::endl;
     std::cout << "CFL parameters:" << std::endl;

@@ -77,7 +77,7 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement_phi(
 
                 double phi_h = 0.0;
                 double T_h = 0.0;
-                T_h = Tm_; //debug
+                T_h = Tm_ - 0.01; //debug
                 for(unsigned int A = 0 ; A < Nne ; A++){
                     unsigned int globalNodeIndex = mesh_.elements[e].node[A];
                     phi_h += ShapeFunction<Nsd,Nne,BfOrder>::basis_function(A, xi_vec)*phi_[globalNodeIndex];
