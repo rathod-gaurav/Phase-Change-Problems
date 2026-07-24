@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include "Assembler.hpp"
 #include "BoundaryConditions.hpp"
+#include "Mesh.hpp"
 
 template <unsigned int Nsd, unsigned int Nne, unsigned int BfOrder>
 class CoupledPhaseFieldSolver{
@@ -12,7 +13,8 @@ class CoupledPhaseFieldSolver{
             const double epsilon,
             const double dt,
             const unsigned int NT,
-            const unsigned int incrSteps //in case incremental loading is required for dirischlet BCs
+            const unsigned int incrSteps, //in case incremental loading is required for dirischlet BCs
+            const Mesh<Nsd,Nne>& mesh //debug : remove mesh
         );
 
         void solve(
@@ -30,6 +32,7 @@ class CoupledPhaseFieldSolver{
         const double dt_;
         const unsigned int NT_;
         const unsigned int incrSteps_;
+        const Mesh<Nsd,Nne>& mesh_;
 };
 
 #include "Solver.tpp"

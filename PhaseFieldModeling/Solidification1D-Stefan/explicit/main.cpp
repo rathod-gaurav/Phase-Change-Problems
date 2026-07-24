@@ -120,7 +120,7 @@ int main(){
     //Initialize the phi and T global vectors
     Eigen::VectorXd phi = Eigen::VectorXd::Zero(mesh.Nnodes());
     Eigen::VectorXd T = Eigen::VectorXd::Zero(mesh.Nnodes());
-    double X0 = 0.005;
+    double X0 = 0.009;
     for(unsigned int i = 0 ; i < mesh.Nnodes() ; i++){
         // phi(i) = 0.5*(1 - std::tanh((mesh.nodes[i].x1 - X0)/delta));
         if(mesh.nodes[i].x1 < X0){
@@ -136,7 +136,7 @@ int main(){
     QuadratureRule<Nsd,Nne>                     quadRule = Quadrature<Nsd,Nne>::gauss_legendre(quadOrder);
     ElementEvaluator<Nsd,Nne,BfOrder>           elemEval(mesh, quadRule, rho, W, lambda, LatentHeat, Tm, phi, T, gFunc, pFunc, gFuncDerivative, pFuncDerivative, Cphi, Kphi);
     Assembler<Nsd,Nne,BfOrder>                  assembler(mesh,elemEval);
-    CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>    solver(tau, epsilon, dt, NT, incrSteps);
+    CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>    solver(tau, epsilon, dt, NT, incrSteps, mesh); //debug : remove mesh
     OutputWriter<Nsd,Nne>                       writer(mesh, "output_data", "localhost", 8000);
 
     writer.writeAndSend(0,0,phi,T);

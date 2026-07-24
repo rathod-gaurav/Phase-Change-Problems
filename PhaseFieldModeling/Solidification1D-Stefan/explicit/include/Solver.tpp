@@ -8,13 +8,15 @@ CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::CoupledPhaseFieldSolver(
     const double epsilon,
     const double dt,
     const unsigned int NT,
-    const unsigned int incrSteps
+    const unsigned int incrSteps,
+    const Mesh<Nsd,Nne>& mesh //debug : remove mesh
 ) :
     tau_(tau),
     epsilon_(epsilon),
     dt_(dt),
     NT_(NT),
-    incrSteps_(incrSteps)
+    incrSteps_(incrSteps),
+    mesh_(mesh)
 {}
 
 template <unsigned int Nsd, unsigned int Nne, unsigned int BfOrder>
@@ -94,13 +96,41 @@ void CoupledPhaseFieldSolver<Nsd,Nne,BfOrder>::solve(
         phi = phi_np1;
         // T = T_np1;
 
+        //debug
+        // 1. Interface width (phi=0.88 to phi=0.12 distance)
+        double x_88 = -1, x_12 = -1;
+        double h = mesh_.nodes[1].x1 - mesh_.nodes[0].x1;
+        for(int i = 0; i < mesh_.Nnodes()-1; i++){
+            if(phi[i] >= 0.88 && phi[i+1] < 0.88)
+                x_88 = mesh_.nodes[i].x1 + (0.88-phi[i])/(phi[i+1]-phi[i])*h;
+            if(phi[i] >= 0.12 && phi[i+1] < 0.12)
+                x_12 = mesh_.nodes[i].x1 + (0.12-phi[i])/(phi[i+1]-phi[i])*h;
+        }
+        double width = (x_88>0 && x_12>0) ? x_12-x_88 : -1;
+
+        // 2. Temperature at interface centre
+        int iface = 0;
+        double min_diff = 1.0;
+        for(int i=0; i<mesh_.Nnodes(); i++)
+            if(fabs(phi[i]-0.5) < min_diff){ min_diff=fabs(phi[i]-0.5); iface=i; }
+        double T_iface = T[iface];
+
+        // 3. Undercooling at interface
+        double undercooling = 273.15 - T_iface;
+
+        std::cout << "t=" << t
+                << "  width=" << width
+                << "  T_iface=" << T_iface
+                << "  undercooling=" << undercooling
+                << std::endl;
+
         if (iterCallback) {
             iterCallback(timestep, t, phi, T);
         }
 
         bool is_phi_bounded = (phi.array() >= 0.0).all() && (phi.array() <= 1.0).all();
         if (!is_phi_bounded) {
-            std::cout << "Out of bounds phi detected at timestep: " << timestep << " time: " << t << std::endl;
+            // std::cout << "Out of bounds phi detected at timestep: " << timestep << " time: " << t << std::endl;
             // break;
         }
 
