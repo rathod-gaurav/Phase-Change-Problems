@@ -28,21 +28,21 @@ class OutputWriter {
             std::vector<double> T_vals(num_nodes);
 
             // 1. Extract data and write to local CSV
-            std::string filename = outputDirectory_ + "/state_" + std::to_string(timestep) + ".csv";
-            std::ofstream file(filename);
+            // std::string filename = outputDirectory_ + "/state_" + std::to_string(timestep) + ".csv";
+            // std::ofstream file(filename);
             
-            if (file.is_open()) {
-                file << "x,phi,T\n";
+            // if (file.is_open()) {
+                // file << "x,phi,T\n";
                 for (unsigned int i = 0; i < num_nodes; ++i) {
                     x_coords[i] = mesh_.nodes[i].x1;
                     phi_vals[i] = phi(i);
                     T_vals[i] = T(i);
-                    file << x_coords[i] << "," << phi_vals[i] << "," << T_vals[i] << "\n";
+                    // file << x_coords[i] << "," << phi_vals[i] << "," << T_vals[i] << "\n";
                 }
-                file.close();
-            } else {
-                std::cerr << "Error: Could not open file for writing: " << filename << std::endl;
-            }
+                // file.close();
+            // } else {
+                // std::cerr << "Error: Could not open file for writing: " << filename << std::endl;
+            // }
 
             // 2. Serialize and Send to Server
             json payload;
