@@ -5,12 +5,14 @@
 #include <random>
 #include <Eigen/Dense>
 #include <MeshGenerator.hpp>
+#include <BoundaryConditions.hpp>
+#include <Quadrature.hpp>
 #include <OutputWriter.hpp>
 
 int main() {
     constexpr unsigned int Nsd = 2;
-    constexpr unsigned int BfOrder = 2;
-    constexpr unsigned int Nne = 9;
+    constexpr unsigned int BfOrder = 1;
+    constexpr unsigned int Nne = 3;
 
     //number of timesteps to solve for
     unsigned int NT = 1000;
