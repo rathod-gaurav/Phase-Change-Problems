@@ -46,7 +46,7 @@ int main() {
     std::cout << "Mesh built: " << mesh.Nnodes() << " nodes, " << mesh.Nelements() << " elements" << std::endl;
     std::cout << "--------------------" << std::endl;
     
-    //initialize the solution vector
+    //initialize the solution vectors
     Eigen::VectorXd c = Eigen::VectorXd::Zero(mesh.Nnodes());
     Eigen::VectorXd mu = Eigen::VectorXd::Zero(mesh.Nnodes());
     
