@@ -2,12 +2,15 @@
 #include <stdexcept>
 #include <math.h>
 #include <cmath>
+#include <random>
+#include <Eigen/Dense>
 #include <MeshGenerator.hpp>
+#include <OutputWriter.hpp>
 
 int main() {
     constexpr unsigned int Nsd = 2;
-    constexpr unsigned int BfOrder = 1;
-    constexpr unsigned int Nne = 4;
+    constexpr unsigned int BfOrder = 2;
+    constexpr unsigned int Nne = 9;
 
     //number of timesteps to solve for
     unsigned int NT = 1000;
@@ -27,12 +30,24 @@ int main() {
     //domain and mesh parameters
     double x1_ll = 0.0, x1_ul = 1.0;
     double x2_ll = 0.0, x2_ul = 1.0;
-    double Nel_x1 = 100, Nel_x2 = 100;
+    double Nel_x1 = 10, Nel_x2 = 10;
     MeshGenerator<Nsd,Nne,BfOrder> meshGen(x1_ll, x1_ul, x2_ll, x2_ul, Nel_x1, Nel_x2);
     Mesh<Nsd,Nne> mesh = meshGen.buildMesh();
     mesh.writeToFiles("mesh");
 
     std::cout << "Mesh built: " << mesh.Nnodes() << " nodes, " << mesh.Nelements() << " elements" << std::endl;
     std::cout << "--------------------" << std::endl;
+    
+    //initialize the solution vector
+    Eigen::VectorXd c = Eigen::VectorXd::Zero(mesh.Nnodes());
+    std::random_device rd;
+    std::default_random_engine gen(rd());
+    std::uniform_real_distribution<double> dist(-1.0, std::nextafter(1, std::numeric_limits<double>::max()));
+    for(unsigned int i = 0 ; i < mesh.Nnodes(); i++){
+        c(i) = dist(gen);
+    }
+
+    OutputWriter<Nsd,Nne> writer("output");
+    writer.writeVTU(mesh, c, 0);
     
 }
