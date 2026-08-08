@@ -194,7 +194,7 @@ template<unsigned int Nsd, unsigned int Nne>
 void OutputWriter<Nsd, Nne>::writePVD(
     const std::string& filename
 ) const {
-    std::string path = outputDir_ + "/" + filename;
+    std::string path = filename;
     std::ofstream file(path);
     if (!file.is_open()) {
         std::cerr << "OutputWriter: could not open " << path << "\n";
@@ -212,31 +212,33 @@ void OutputWriter<Nsd, Nne>::writePVD(
     std::cout << "PVD written: " << path << "\n";
 }
 
-template<unsigned int Nsd, unsigned int Nne>
-void OutputWriter<Nsd, Nne>::sendResidual(
-    unsigned int incr,
-    unsigned int iter,
-    double residualNorm
-) const {
 
-    CURL* curl = curl_easy_init();
-    if (!curl) return;
+//dont neet this for explicit solver
+// template<unsigned int Nsd, unsigned int Nne>
+// void OutputWriter<Nsd, Nne>::sendResidual(
+//     unsigned int incr,
+//     unsigned int iter,
+//     double residualNorm
+// ) const {
 
-    std::ostringstream json;
-    json << "{\"increment\":" << incr
-        << ",\"iteration\":" << iter
-        << ",\"residual\":"  << residualNorm << "}";
-    std::string body = json.str();
+//     CURL* curl = curl_easy_init();
+//     if (!curl) return;
 
-    struct curl_slist* headers = nullptr;
-    headers = curl_slist_append(headers, "Content-Type: application/json");
+//     std::ostringstream json;
+//     json << "{\"increment\":" << incr
+//         << ",\"iteration\":" << iter
+//         << ",\"residual\":"  << residualNorm << "}";
+//     std::string body = json.str();
 
-    curl_easy_setopt(curl, CURLOPT_URL,       "http://127.0.0.1:8000/residual");
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT,    2L); // don't block the solver
+//     struct curl_slist* headers = nullptr;
+//     headers = curl_slist_append(headers, "Content-Type: application/json");
 
-    curl_easy_perform(curl);
-    curl_slist_free_all(headers);
-    curl_easy_cleanup(curl);
-}
+//     curl_easy_setopt(curl, CURLOPT_URL,       "http://127.0.0.1:8000/residual");
+//     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
+//     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+//     curl_easy_setopt(curl, CURLOPT_TIMEOUT,    2L); // don't block the solver
+
+//     curl_easy_perform(curl);
+//     curl_slist_free_all(headers);
+//     curl_easy_cleanup(curl);
+// }

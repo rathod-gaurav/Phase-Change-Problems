@@ -16,8 +16,8 @@ class Assembler{
         ); //constructor to initialize the assembler with the mesh, element evaluator, and diffusion evaluator
 
         void assembleSystem(
-            Eigen::MatrixXd<double>& Mglobal, //global mass matrix (Nnodes x Nnodes matrix)
-            Eigen::MatrixXd<double>& Kglobal, //global stiffness  matrix (Nnodes x Nnodes matrix)
+            Eigen::MatrixXd& Mglobal, //global mass matrix (Nnodes x Nnodes matrix)
+            Eigen::MatrixXd& Kglobal, //global stiffness  matrix (Nnodes x Nnodes matrix)
             Eigen::VectorXd& Bglobal //global nonlinear bulk free energy vector (Nnodes x 1 vector)
         ) const;
     

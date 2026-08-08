@@ -11,8 +11,8 @@ Assembler<Nsd,Nne,BfOrder>::Assembler(
 
 template <unsigned int Nsd, unsigned int Nne, unsigned int BfOrder>
 void Assembler<Nsd,Nne,BfOrder>::assembleSystem(
-    Eigen::MatrixXd<double>& Mglobal, //global mass matrix (Nnodes x Nnodes matrix)
-    Eigen::MatrixXd<double>& Kglobal, //global stiffness  matrix (Nnodes x Nnodes matrix)
+    Eigen::MatrixXd& Mglobal, //global mass matrix (Nnodes x Nnodes matrix)
+    Eigen::MatrixXd& Kglobal, //global stiffness  matrix (Nnodes x Nnodes matrix)
     Eigen::VectorXd& Bglobal //global nonlinear bulk free energy vector (Nnodes x 1 vector)
 ) const {
     unsigned int Nt = mesh_.Nnodes();

@@ -11,7 +11,7 @@ class ElementEvaluator {
     public:
         ElementEvaluator( //default constructor
             const Mesh<Nsd,Nne>& mesh,
-            const QuadratureRule<Nsd,Nne> quadRule,
+            const QuadratureRule<Nsd,Nne>& quadRule,
             const Eigen::VectorXd& c, //solution vector for concentration field
             const Eigen::VectorXd& mu, //solution vector for chemical potential field
             const std::function<double(double)> fFunc,

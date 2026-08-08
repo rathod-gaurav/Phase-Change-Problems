@@ -4,7 +4,7 @@
 template<unsigned int Nsd, unsigned int Nne, unsigned int BfOrder>
 ElementEvaluator<Nsd,Nne,BfOrder>::ElementEvaluator(
     const Mesh<Nsd,Nne>& mesh,
-    const QuadratureRule<Nsd,Nne> quadRule,
+    const QuadratureRule<Nsd,Nne>& quadRule,
     const Eigen::VectorXd& c, //solution vector for concentration field
     const Eigen::VectorXd& mu, //solution vector for chemical potential field
     const std::function<double(double)> fFunc,
@@ -96,7 +96,7 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement(
                         VectorNsd dNB_dx = JacInv * basis_gradient_vecB; //gradient of basis function B with respect to x1 and x2
 
                         Mlocal(A,B) += NA * NB * weight * JacDet;
-                        Klocal(A,B) += (dNA_dx.transpose() * dNB_dx) * weight * JacDet;
+                        Klocal(A,B) += ((dNA_dx.transpose() * dNB_dx) * weight * JacDet).value();
                     }
 
                     double c_e = c_(mesh_.elements[e].node[A]);
@@ -134,7 +134,7 @@ void ElementEvaluator<Nsd,Nne,BfOrder>::computeElement(
                             VectorNsd dNB_dx = JacInv * basis_gradient_vecB; //gradient of basis function B with respect to x1 and x2
 
                             Mlocal(A,B) += NA * NB * weight * JacDet;
-                            Klocal(A,B) += (dNA_dx.transpose() * dNB_dx) * weight * JacDet;
+                            Klocal(A,B) += ((dNA_dx.transpose() * dNB_dx) * weight * JacDet).value();
                         }
 
                         double c_e = c_(mesh_.elements[e].node[A]);
