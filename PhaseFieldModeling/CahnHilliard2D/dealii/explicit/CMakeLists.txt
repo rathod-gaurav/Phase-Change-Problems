@@ -10,7 +10,7 @@ find_package(deal.II 9.7.1 REQUIRED
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
 # Define your executable and source file
-add_executable(main main.cc)
+add_executable(main main.cpp)
 
 # Link deal.II and all dependencies (MPI, PETSc, Trilinos, p4est)
 DEAL_II_SETUP_TARGET(main)
