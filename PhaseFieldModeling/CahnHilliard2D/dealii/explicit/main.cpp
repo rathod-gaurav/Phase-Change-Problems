@@ -55,12 +55,31 @@ void distribute_dofs(DoFHandler<2> &dof_handler){
     sparsity_pattern.print_svg(out);
 }
 
+void renumber_dofs(DoFHandler<2> &dof_handler){
+    DoFRenumbering::Cuthill_McKee(dof_handler);
+    
+    write_dof_locations(dof_handler, "dof_locations_2.gnuplot"); //we have now associated a degree of freedom with a global node number to each vertex. this line of code outputs the information to a file using the function declared above
+    
+    //Sparsity pattern - we first need to create a structure which we use to store the places of nonzero elements 
+    //this can later be used by one or more sparse matrix objects that store the values of the entries in the locations provided by this sparsity pattern
+    DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(), dof_handler.n_dofs()); //this uses an internal data structure that we can later copy into the SparsityPattern object without much overhead. In order to initialize this data structue, we first need to give it the size of the matrix- which in this case will be square with as many rows and columns as the number of Dofs on the grid
+    DoFTools::make_sparsity_pattern(dof_handler, dynamic_sparsity_pattern); //this fills the dynamic_sparsity_pattern object with with the places where nonzero elements will be located
+    //now we are ready to create the actual sparsity pattern that we could later use for our matrices
+    SparsityPattern sparsity_pattern;
+    sparsity_pattern.copy_from(dynamic_sparsity_pattern); //the sparsity_pattern contains the data already assembled in the DynamicSparsityPattern
+    //write sparsity_pattern results to a file
+    std::ofstream out("sparsity_pattern_2.svg");
+    sparsity_pattern.print_svg(out);
+}
+
 int main(){
     Triangulation<2> triangulation; //2D triangulation object
     generate_grid(triangulation);
     
     DoFHandler<2> dof_handler(triangulation);
     distribute_dofs(dof_handler);
+
+    renumber_dofs(dof_handler);
  
     return 0;
 }
