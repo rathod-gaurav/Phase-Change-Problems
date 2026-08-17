@@ -10,7 +10,7 @@ class CahnHilliard{
         double x_ll_, x_ul_;
 
         void make_grid();
-        // void setup_system();
+        void setup_system();
         // void compute_element();
         // void assemble_system();
         // void solve();
@@ -20,10 +20,15 @@ class CahnHilliard{
         const FE_Q<Nsd> fe;
         DoFHandler<Nsd> dof_handler;
 
+        SparsityPattern sparsity_pattern;
+        SparseMatrix<double> Mglobal;
+        SparseMatrix<double> Kglobal;
+        Vector<double> Bglobal;
+        Vector<double> c;
+        Vector<double> mu;
 };
-
 
 #include "CahnHilliard.tpp"
 
 #include "MakeGrid.tpp"
-
+#include "SetupSystem.tpp"

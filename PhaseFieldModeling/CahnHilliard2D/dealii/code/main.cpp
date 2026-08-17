@@ -31,7 +31,7 @@ using namespace dealii;
 #include <CahnHilliard.hpp>
 
 int main(){
-    constexpr unsigned int Nsd = 2; //2 for 2D problem, 3 for 3D problem
+    constexpr unsigned int Nsd = 3; //2 for 2D problem, 3 for 3D problem
     constexpr unsigned int BfOrder = 1; //1 for linear elements, 2 for quadratic
 
     unsigned int NT = 1000; //number of timesteps to solve for
