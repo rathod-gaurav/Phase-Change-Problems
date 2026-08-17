@@ -52,6 +52,6 @@ int main(){
     //domain and mesh parameters
     double x_ll = 0.0, x_ul = 1.0; //square domain
 
-    CahnHilliard<Nsd,BfOrder> problem(x_ll, x_ul);
+    CahnHilliard<Nsd,BfOrder> problem(x_ll, x_ul, quadOrder, fFuncDerivative);
     problem.run();
 }
