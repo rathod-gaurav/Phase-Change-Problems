@@ -50,9 +50,8 @@ int main(){
     auto fFuncDerivative = [](double c){ return c*(c*c - 1); };
 
     //domain and mesh parameters
-    double x1_ll = 0.0, x1_ul = 1.0;
-    double x2_ll = 0.0, x2_ul = 1.0;
+    double x_ll = 0.0, x_ul = 1.0; //square domain
 
-    CahnHilliard<Nsd,BfOrder> problem;
+    CahnHilliard<Nsd,BfOrder> problem(x_ll, x_ul);
     problem.run();
 }
