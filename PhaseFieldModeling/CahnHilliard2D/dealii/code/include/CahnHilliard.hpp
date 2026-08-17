@@ -9,7 +9,7 @@ class CahnHilliard{
     private:
         double x_ll_, x_ul_;
 
-        void make_grid(double x_ll, double x_ul);
+        void make_grid();
         // void setup_system();
         // void compute_element();
         // void assemble_system();
