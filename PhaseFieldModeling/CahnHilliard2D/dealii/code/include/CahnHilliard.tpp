@@ -24,7 +24,6 @@ CahnHilliard<Nsd,BfOrder>::CahnHilliard(
 
 template <unsigned int Nsd, unsigned int BfOrder>
 void CahnHilliard<Nsd,BfOrder>::run(){
-    std::cout << "I ran successfully" << std::endl;
     make_grid();
     setup_system();
     solve();

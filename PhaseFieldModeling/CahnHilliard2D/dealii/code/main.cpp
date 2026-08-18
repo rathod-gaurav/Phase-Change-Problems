@@ -18,7 +18,10 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
+// #include <deal.II/lac/solver_cg.h>
+// #include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/sparse_direct.h>
+#include <deal.II/lac/sparse_ilu.h>
 #include <deal.II/lac/precondition.h>
 
 //output
@@ -26,6 +29,9 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+
+//random number generator
+#include <random>
 
 using namespace dealii;
 
@@ -49,7 +55,7 @@ int main(){
 
     //assumptions
     double epsilon = sqrt(2.0);
-    double dt = 1e-7;
+    double dt = 1e-10;
 
     //bulk free energy function
     // auto fFunc = [](double c){ return 0.25*pow((c*c - 1),2); };

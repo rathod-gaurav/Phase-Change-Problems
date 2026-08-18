@@ -9,6 +9,7 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
 
     std::ofstream pvd_output("final_solution.pvd");
     output_writer_.initiate_pvd(pvd_output); //initiated pvd file with headers
+    output_writer_.write_vtu_and_pvd(dof_handler, c, mu, 0, pvd_output);
 
     double t = dt_;
     for(unsigned int timestep = 1 ; timestep < NT_ ; timestep++){
@@ -17,28 +18,44 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
         Bglobal = 0.0;
         assemble_system();
         
-        // RHS1 = Kglobal*(epsilon_*epsilon_)*c + Bglobal;
+        // SparseILU<double> preconditioner;
+        // preconditioner.initialize(Mglobal);
+
+        // // RHS1 = Kglobal*(epsilon_*epsilon_)*c + Bglobal;
         Kglobal.vmult(RHS1,c);
         RHS1 *= (epsilon_*epsilon_);
         RHS1 += Bglobal;
-        SolverControl solver1_control(NCG_, epsilonCG_*RHS1.l2_norm());
-        SolverCG<Vector<double>> solver1(solver1_control);
-        solver1.solve(Mglobal, mu_np1, RHS1, PreconditionIdentity());
 
-        // RHS2 = Mglobal*c - Kglobal*dt_*Mobility_*mu_np1;
+        SparseDirectUMFPACK directsolver1;
+        directsolver1.initialize(Mglobal);
+        directsolver1.vmult(mu_np1, RHS1);
+
+
+        // SolverControl solver1_control(NCG_, epsilonCG_*RHS1.l2_norm());
+        // SolverGMRES<Vector<double>> solver1(solver1_control);
+        // // std::cout << "||A||_F=" << Mglobal.frobenius_norm()
+        // //   << "  ||b||="  << RHS1.l2_norm()
+        // //   << "  ||x0||=" << c.l2_norm() << std::endl;
+        // solver1.solve(Mglobal, mu_np1, RHS1, PreconditionIdentity());
+
+        // // RHS2 = Mglobal*c - Kglobal*dt_*Mobility_*mu_np1;
         Kglobal.vmult(RHS2,mu_np1);
         RHS2 *= (-1*dt_*Mobility_);
         Mglobal.vmult(RHS2_,c);
-        // RHS2 = RHS2_ - RHS2;
-        RHS2.add(1,RHS2_);
-        SolverControl solver2_control(NCG_, epsilonCG_*RHS2.l2_norm());
-        SolverCG<Vector<double>> solver2(solver2_control);
-        solver2.solve(Mglobal, c_np1, RHS2, PreconditionIdentity()); 
+
+        SparseDirectUMFPACK directsolver2;
+        directsolver2.initialize(Mglobal);
+        directsolver2.vmult(c_np1, RHS2);
+
+        // RHS2.add(1,RHS2_);
+        // SolverControl solver2_control(NCG_, epsilonCG_*RHS2.l2_norm());
+        // SolverGMRES<Vector<double>> solver2(solver2_control);
+        // solver2.solve(Mglobal, c_np1, RHS2, PreconditionIdentity()); 
 
         mu = mu_np1;
         c = c_np1;  
         
-        output_writer_.write_vtu_and_pvd(dof_handler, c, mu, timestep, dt_, pvd_output);
+        output_writer_.write_vtu_and_pvd(dof_handler, c, mu, timestep, pvd_output);
 
         t+= dt_;
     }

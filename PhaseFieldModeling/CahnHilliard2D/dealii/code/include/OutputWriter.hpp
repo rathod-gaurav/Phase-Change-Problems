@@ -5,7 +5,7 @@ class OutputWriter{
     public:
         explicit OutputWriter(const std::string& output_dir);
 
-        void write_vtu_and_pvd(DoFHandler<Nsd>& dof_handler, Vector<double>& solution1, Vector<double>& solution2, const unsigned int timestep, const double dt, std::ofstream &pvd_output);
+        void write_vtu_and_pvd(DoFHandler<Nsd>& dof_handler, Vector<double>& solution1, Vector<double>& solution2, const unsigned int timestep, std::ofstream &pvd_output);
 
         void initiate_pvd(std::ofstream &pvd_output);
         void finish_pvd(std::ofstream &pvd_output);

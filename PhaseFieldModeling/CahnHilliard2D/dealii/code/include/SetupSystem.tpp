@@ -23,5 +23,16 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     RHS2.reinit(dof_handler.n_dofs());
     RHS2_.reinit(dof_handler.n_dofs());
 
+    //Initial conditions
+    c = 0.0;
+    // std::random_device rd;
+    std::default_random_engine gen(123);
+    std::uniform_real_distribution<double> dist(-1.0, std::nextafter(1, std::numeric_limits<double>::max()));
+    for(unsigned int i = 0 ; i < dof_handler.n_dofs(); i++){
+        c(i) = dist(gen);
+    }
+    
+    mu = 0.0;
+
     std::cout << "All global system matrices and vectors initialized" << std::endl;
 }
