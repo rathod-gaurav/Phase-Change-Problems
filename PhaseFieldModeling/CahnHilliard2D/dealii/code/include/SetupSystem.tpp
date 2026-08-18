@@ -16,5 +16,12 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     c.reinit(dof_handler.n_dofs());
     mu.reinit(dof_handler.n_dofs());
 
+    c_np1.reinit(dof_handler.n_dofs());
+    mu_np1.reinit(dof_handler.n_dofs());
+
+    RHS1.reinit(dof_handler.n_dofs());
+    RHS2.reinit(dof_handler.n_dofs());
+    RHS2_.reinit(dof_handler.n_dofs());
+
     std::cout << "All global system matrices and vectors initialized" << std::endl;
 }

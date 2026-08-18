@@ -2,12 +2,20 @@
 
 template <unsigned int Nsd, unsigned int BfOrder>
 CahnHilliard<Nsd,BfOrder>::CahnHilliard(
-    const double x_ll, const double x_ul, const double quadOrder, const std::function<double(double)> fFuncDerivative
+    const double x_ll, const double x_ul, const double quadOrder, const std::function<double(double)> fFuncDerivative, 
+    const unsigned int NT, const double Mobility, const double epsilon, const double dt,
+    const unsigned int NCG, const double epsilonCG
 ):
     x_ll_(x_ll),
     x_ul_(x_ul),
     quadOrder_(quadOrder),
     fFuncDerivative_(fFuncDerivative),
+    NT_(NT),
+    Mobility_(Mobility),
+    epsilon_(epsilon),
+    dt_(dt),
+    NCG_(NCG),
+    epsilonCG_(epsilonCG),
     fe(BfOrder),
     dof_handler(triangulation)
 {}
@@ -17,7 +25,6 @@ void CahnHilliard<Nsd,BfOrder>::run(){
     std::cout << "I ran successfully" << std::endl;
     make_grid();
     setup_system();
-    assemble_system();
-    // solve();
+    solve();
     // output_writer();
 }
