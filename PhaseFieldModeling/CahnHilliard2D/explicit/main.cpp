@@ -30,7 +30,7 @@ int main() {
 
     //assumptions
     double epsilon = sqrt(2.0);
-    double dt = 1e-7;
+    double dt = 1e-9;
 
     //bulk free energy function
     auto fFunc = [](double c){ return 0.25*pow((c*c - 1),2); };
@@ -40,7 +40,7 @@ int main() {
     double x1_ll = 0.0, x1_ul = 1.0;
     double x2_ll = 0.0, x2_ul = 1.0;
     // double x3_ll = 0.0, x3_ul = 1.0;
-    double Nel_x1 = 10, Nel_x2 = 10;
+    double Nel_x1 = 32, Nel_x2 = 32;
     MeshGenerator<Nsd,Nne,BfOrder> meshGen(x1_ll, x1_ul, x2_ll, x2_ul, Nel_x1, Nel_x2);
     Mesh<Nsd,Nne> mesh = meshGen.buildMesh();
     mesh.writeToFiles("mesh");
