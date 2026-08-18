@@ -7,8 +7,14 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
 
     std::cout << "Initiating solver..." << std::endl;
 
+    std::ofstream pvd_output("final_solution.pvd");
+    output_writer_.initiate_pvd(pvd_output); //initiated pvd file with headers
+
     double t = dt_;
     for(unsigned int timestep = 1 ; timestep < NT_ ; timestep++){
+        Mglobal = 0.0;
+        Kglobal = 0.0;
+        Bglobal = 0.0;
         assemble_system();
         
         // RHS1 = Kglobal*(epsilon_*epsilon_)*c + Bglobal;
@@ -30,10 +36,14 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
         solver2.solve(Mglobal, c_np1, RHS2, PreconditionIdentity()); 
 
         mu = mu_np1;
-        c = c_np1;        
+        c = c_np1;  
+        
+        output_writer_.write_vtu_and_pvd(dof_handler, c, mu, timestep, dt_, pvd_output);
 
         t+= dt_;
     }
+
+    output_writer_.finish_pvd(pvd_output); //finishes pvd file with footer
 
     std::cout << "Solve completed." << std::endl;
 
