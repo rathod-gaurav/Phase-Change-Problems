@@ -6,7 +6,8 @@ set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the build type" FORCE)
 
 # Point CMake to your deal.II installation path
 find_package(deal.II 9.7.1 REQUIRED
-  HINTS /home/grathod/Downloads/dealii/dealii/installation_files
+#  HINTS /home/grathod/Downloads/dealii/dealii/installation_files
+   HINTS $ENV{DEAL_II_DIR}
 )
 
 include_directories("include")

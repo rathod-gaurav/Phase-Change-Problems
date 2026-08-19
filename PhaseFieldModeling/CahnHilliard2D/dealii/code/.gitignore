@@ -7,3 +7,7 @@ output1
 output2
 final_solution1.pvd
 final_solution2.pvd
+run1.sh
+run2.sh
+*.err
+*.out
