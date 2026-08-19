@@ -16,7 +16,7 @@ void OutputWriter<Nsd,BfOrder>::write_vtu_and_pvd(DoFHandler<Nsd>& dof_handler, 
 
     data_out.build_patches();
 
-    std::string filename = output_dir_ + "/solution-" + dealii::Utilities::int_to_string(timestep, 4) + ".vtu"; //4 is for padding integer names in the file names
+    std::string filename = output_dir_ + "/solution-" + dealii::Utilities::int_to_string(timestep, 7) + ".vtu"; //6 is for padding integer names in the file names
     std::ofstream vtu_output(filename);
     data_out.write_vtu(vtu_output);
     pvd_output << "    <DataSet timestep=\"" << timestep << "\" group=\"\" part=\"0\" file=\"" << filename << "\"/>\n"; //append to pvd file

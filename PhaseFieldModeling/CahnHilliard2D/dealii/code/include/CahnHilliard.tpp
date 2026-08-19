@@ -2,7 +2,7 @@
 
 template <unsigned int Nsd, unsigned int BfOrder>
 CahnHilliard<Nsd,BfOrder>::CahnHilliard(
-    const double x_ll, const double x_ul, const double quadOrder, const std::function<double(double)> fFuncDerivative, 
+    const double x_ll, const double x_ul, const double quadOrder, const std::function<double(double)> fFunc, const std::function<double(double)> fFuncDerivative, 
     const unsigned int NT, const double Mobility, const double epsilon, const double dt,
     const unsigned int NCG, const double epsilonCG,
     OutputWriter<Nsd,BfOrder>& output_writer
@@ -10,6 +10,7 @@ CahnHilliard<Nsd,BfOrder>::CahnHilliard(
     x_ll_(x_ll),
     x_ul_(x_ul),
     quadOrder_(quadOrder),
+    fFunc_(fFunc),
     fFuncDerivative_(fFuncDerivative),
     NT_(NT),
     Mobility_(Mobility),

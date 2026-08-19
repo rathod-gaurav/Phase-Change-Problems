@@ -5,7 +5,7 @@
 template<unsigned int Nsd, unsigned int BfOrder>
 class CahnHilliard{
     public:
-        CahnHilliard(const double x_ll, const double x_ul, const double quadOrder, const std::function<double(double)> fFuncDerivative, 
+        CahnHilliard(const double x_ll, const double x_ul, const double quadOrder, const std::function<double(double)> fFunc, const std::function<double(double)> fFuncDerivative, 
                     const unsigned int NT, const double Mobility, const double epsilon, const double dt,
                     const unsigned int NCG, const double epsilonCG,
                     OutputWriter<Nsd,BfOrder>& output_writer
@@ -14,6 +14,7 @@ class CahnHilliard{
     
     private:
         const double x_ll_, x_ul_, quadOrder_;
+        const std::function<double(double)> fFunc_;
         const std::function<double(double)> fFuncDerivative_;
         const unsigned int NT_;
         const double Mobility_, epsilon_, dt_;
@@ -26,6 +27,7 @@ class CahnHilliard{
         void compute_element(const typename DoFHandler<Nsd>::active_cell_iterator& elem, FEValues<Nsd>& fe_values, FullMatrix<double>& Mlocal, FullMatrix<double>& Klocal, Vector<double>& Blocal, std::vector<types::global_dof_index>& local_dof_indices);
         void assemble_system();
         void solve();
+        void debug_system();
 
         Triangulation<Nsd> triangulation;
         const FE_Q<Nsd> fe;

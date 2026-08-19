@@ -8,7 +8,7 @@ void CahnHilliard<Nsd,BfOrder>::compute_element(const typename DoFHandler<Nsd>::
         for(const unsigned int i : fe_values.dof_indices()){
             for(const unsigned int j : fe_values.dof_indices()){
                 Klocal(i,j) += (fe_values.shape_grad(i,q_index)*fe_values.shape_grad(j,q_index)*fe_values.JxW(q_index));
-                Mlocal(i,j) +=  (fe_values.shape_value(i,q_index)*fe_values.shape_value(i,q_index)*fe_values.JxW(q_index));
+                Mlocal(i,j) +=  (fe_values.shape_value(i,q_index)*fe_values.shape_value(j,q_index)*fe_values.JxW(q_index));
             }
             double c_e = c(local_dof_indices[i]);
             Blocal(i) += fFuncDerivative_(c_e)*fe_values.shape_value(i,q_index)*fe_values.JxW(q_index);

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(CahnHilliard CXX)
 
 # Force your preferred build type here (e.g., "Debug" or "Release")
-set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the build type" FORCE)
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the build type" FORCE)
 
 # Point CMake to your deal.II installation path
 find_package(deal.II 9.7.1 REQUIRED

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AssembleSystem.tpp"
+#include "DebugSystem.tpp"
 
 template <unsigned int Nsd, unsigned int BfOrder>
 void CahnHilliard<Nsd,BfOrder>::solve(){    
@@ -42,10 +43,11 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
         Kglobal.vmult(RHS2,mu_np1);
         RHS2 *= (-1*dt_*Mobility_);
         Mglobal.vmult(RHS2_,c);
+        RHS2 += RHS2_;
 
-        SparseDirectUMFPACK directsolver2;
-        directsolver2.initialize(Mglobal);
-        directsolver2.vmult(c_np1, RHS2);
+        // SparseDirectUMFPACK directsolver2;
+        // directsolver2.initialize(Mglobal);
+        directsolver1.vmult(c_np1, RHS2);
 
         // RHS2.add(1,RHS2_);
         // SolverControl solver2_control(NCG_, epsilonCG_*RHS2.l2_norm());
@@ -54,6 +56,8 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
 
         mu = mu_np1;
         c = c_np1;  
+
+        debug_system();
         
         output_writer_.write_vtu_and_pvd(dof_handler, c, mu, timestep, pvd_output);
 
