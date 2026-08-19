@@ -8,7 +8,7 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
 
     std::cout << "Initiating solver..." << std::endl;
 
-    std::ofstream pvd_output("final_solution.pvd");
+    std::ofstream pvd_output("final_solution2.pvd");
     output_writer_.initiate_pvd(pvd_output); //initiated pvd file with headers
     output_writer_.write_vtu_and_pvd(dof_handler, c, mu, 0, pvd_output);
 
@@ -57,10 +57,10 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
         mu = mu_np1;
         c = c_np1;  
 
-        debug_system();
+        // debug_system();
         
         output_writer_.write_vtu_and_pvd(dof_handler, c, mu, timestep, pvd_output);
-
+        std::cout << "Solve completed for timestep " << timestep << std::endl;
         t+= dt_;
     }
 

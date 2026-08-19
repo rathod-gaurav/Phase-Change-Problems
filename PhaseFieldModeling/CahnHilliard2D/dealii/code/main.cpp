@@ -64,7 +64,7 @@ int main(){
     //domain and mesh parameters
     double x_ll = 0.0, x_ul = 1.0; //square domain for 2D, cube domain for 3D
 
-    OutputWriter<Nsd,BfOrder> output_writer("output");
+    OutputWriter<Nsd,BfOrder> output_writer("output2");
     CahnHilliard<Nsd,BfOrder> problem(x_ll, x_ul, quadOrder, fFunc, fFuncDerivative, NT, Mobility, epsilon, dt, NCG, epsilonCG, output_writer);
     
     problem.run();
