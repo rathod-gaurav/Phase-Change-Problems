@@ -42,7 +42,7 @@ int main(){
     constexpr unsigned int Nsd = 2; //2 for 2D problem, 3 for 3D problem
     constexpr unsigned int BfOrder = 1; //1 for linear elements, 2 for quadratic
 
-    unsigned int NT = 1000000; //number of timesteps to solve for
+    unsigned int NT = 100; //number of timesteps to solve for
 
     //Conjugate Solver parameters
     unsigned int NCG = 1000;
@@ -64,7 +64,7 @@ int main(){
     //domain and mesh parameters
     double x_ll = 0.0, x_ul = 1.0; //square domain for 2D, cube domain for 3D
 
-    OutputWriter<Nsd,BfOrder> output_writer("output1");
+    OutputWriter<Nsd,BfOrder> output_writer("output0");
     CahnHilliard<Nsd,BfOrder> problem(x_ll, x_ul, quadOrder, fFunc, fFuncDerivative, NT, Mobility, epsilon, dt, NCG, epsilonCG, output_writer);
     
     problem.run();
