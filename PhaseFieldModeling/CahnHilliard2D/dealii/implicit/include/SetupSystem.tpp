@@ -3,25 +3,51 @@
 template <unsigned int Nsd, unsigned int BfOrder>
 void CahnHilliard<Nsd,BfOrder>::setup_system(){
     dof_handler.distribute_dofs(fe);
-    std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
+    const unsigned int N = dof_handler.n_dofs();
+    
+    std::cout << "Number of degrees of freedom: " << N << std::endl;
 
-    DynamicSparsityPattern dsp(dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(N);
     DoFTools::make_sparsity_pattern(dof_handler, dsp);
     sparsity_pattern.copy_from(dsp);
 
     Mglobal.reinit(sparsity_pattern);
     Kglobal.reinit(sparsity_pattern);
 
-    Bglobal.reinit(dof_handler.n_dofs());
-    c.reinit(dof_handler.n_dofs());
-    mu.reinit(dof_handler.n_dofs());
+    Bglobal.reinit(N);
+    c.reinit(N);
+    mu.reinit(N);
 
-    c_np1.reinit(dof_handler.n_dofs());
-    mu_np1.reinit(dof_handler.n_dofs());
+    c_k.reinit(N);
+    mu_k.reinit(N);
 
-    RHS1.reinit(dof_handler.n_dofs());
-    RHS2.reinit(dof_handler.n_dofs());
-    RHS2_.reinit(dof_handler.n_dofs());
+    c_np1.reinit(N);
+    mu_np1.reinit(N);
+
+    RHS1.reinit(N);
+    RHS2.reinit(N);
+    RHS2_.reinit(N);
+
+    NR_update.reinit(2*N);
+    NR_residual.reinit(2*N);    
+
+    DynamicSparsityPattern jac_dsp(2 * N);
+    for (unsigned int i = 0; i < N; ++i){
+        for (unsigned int k = 0; k < dsp.row_length(i); ++k){
+            const auto j = dsp.column_number(i, k);
+            jac_dsp.add(i,     j);
+            jac_dsp.add(i,     j + N);
+            jac_dsp.add(i + N, j);
+            jac_dsp.add(i + N, j + N);
+        }
+    }
+    jacobian_sparsity_pattern.copy_from(jac_dsp);
+    NR_jacobian.reinit(jacobian_sparsity_pattern);
+
+    J_cc.reinit(sparsity_pattern);
+    J_cmu.reinit(sparsity_pattern);
+    J_muc.reinit(sparsity_pattern);
+    J_mumu.reinit(sparsity_pattern);
 
     //Initial conditions
     c = 0.0;
@@ -29,7 +55,7 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     // // std::random_device rd;
     // std::default_random_engine gen(123);
     // std::uniform_real_distribution<double> dist(-1.0, std::nextafter(1, std::numeric_limits<double>::max()));
-    // for(unsigned int i = 0 ; i < dof_handler.n_dofs(); i++){
+    // for(unsigned int i = 0 ; i < N; i++){
     //     c(i) = 0.3 + 0.01*dist(gen);
     // }
 

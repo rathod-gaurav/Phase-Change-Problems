@@ -24,8 +24,10 @@ class CahnHilliard{
 
         void make_grid();
         void setup_system();
-        void compute_element(const typename DoFHandler<Nsd>::active_cell_iterator& elem, FEValues<Nsd>& fe_values, FullMatrix<double>& Mlocal, FullMatrix<double>& Klocal, Vector<double>& Blocal, std::vector<types::global_dof_index>& local_dof_indices);
+        void compute_element(const typename DoFHandler<Nsd>::active_cell_iterator& elem, FEValues<Nsd>& fe_values, FullMatrix<double>& Mlocal, FullMatrix<double>& Klocal, std::vector<types::global_dof_index>& local_dof_indices);
+        void compute_element_B(const typename DoFHandler<Nsd>::active_cell_iterator& elem, FEValues<Nsd>& fe_values, Vector<double>& Blocal, std::vector<types::global_dof_index>& local_dof_indices);
         void assemble_system();
+        void assemble_system_B();
         void solve();
         void debug_system();
 
@@ -33,14 +35,16 @@ class CahnHilliard{
         const FE_Q<Nsd> fe;
         DoFHandler<Nsd> dof_handler;
 
-        SparsityPattern sparsity_pattern;
+        SparsityPattern sparsity_pattern, jacobian_sparsity_pattern;
         SparseMatrix<double> Mglobal;
         SparseMatrix<double> Kglobal;
         Vector<double> Bglobal;
-        Vector<double> c, c_np1;
-        Vector<double> mu, mu_np1;
+        Vector<double> c, c_k, c_np1;
+        Vector<double> mu, mu_k, mu_np1;
         Vector<double> RHS1;
         Vector<double> RHS2, RHS2_;
+        SparseMatrix<double> NR_jacobian, J_cc, J_cmu, J_muc, J_mumu;
+        Vector<double> NR_update, NR_residual;
 };
 
 #include "CahnHilliard.tpp"
