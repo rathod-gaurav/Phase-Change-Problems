@@ -7,7 +7,7 @@ void CahnHilliard<Nsd,BfOrder>::compute_element_B(const typename DoFHandler<Nsd>
     for(const unsigned int q_index : fe_values.quadrature_point_indices()){
         double c_h = 0.0;
         for(const unsigned int i : fe_values.dof_indices()){
-            c_h += fe_values.shape_value(i,q_index)*c(local_dof_indices[i]);
+            c_h += fe_values.shape_value(i,q_index)*c_k(local_dof_indices[i]); //note : here we use c_k instead of c
         }
 
         for(const unsigned int i : fe_values.dof_indices()){

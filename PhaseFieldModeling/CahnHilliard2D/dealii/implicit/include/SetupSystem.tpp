@@ -3,7 +3,7 @@
 template <unsigned int Nsd, unsigned int BfOrder>
 void CahnHilliard<Nsd,BfOrder>::setup_system(){
     dof_handler.distribute_dofs(fe);
-    const unsigned int N = dof_handler.n_dofs();
+    N = dof_handler.n_dofs();
 
     std::cout << "Number of degrees of freedom: " << N << std::endl;
 
@@ -26,6 +26,9 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     c_np1.reinit(N);
     mu_np1.reinit(N);
 
+    delta_c.reinit(N);
+    delta_mu.reinit(N);
+
     RHS1.reinit(N);
     RHS2.reinit(N);
     RHS2_.reinit(N);
@@ -33,8 +36,11 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     NR_update.reinit(2*N);
     NR_residual.reinit(2*N);    
 
+    G_c.reinit(N);
+    G_mu.reinit(N);
+
     DynamicSparsityPattern jac_dsp(2 * N);
-    for (unsigned int i = 0; i < N; ++i){
+    for (unsigned int i = 0; i < N; i++){
         for (unsigned int k = 0; k < dsp.row_length(i); ++k){
             const auto j = dsp.column_number(i, k);
             jac_dsp.add(i, j);
@@ -45,15 +51,6 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     }
     jacobian_sparsity_pattern.copy_from(jac_dsp);
     NR_jacobian.reinit(jacobian_sparsity_pattern);
-
-    bool check;
-    check = NR_jacobian.n_nonzero_elements() == 4*Mglobal.n_nonzero_elements();
-    if(check){
-        std::cout << "Newton Raphson monolithic Jacobian correctly initialised" << std::endl;
-    }
-    else{
-        std::cout << "Newton Raphson monolithic Jacobian NOT correctly initialised" << std::endl;
-    }
 
     J_cc.reinit(sparsity_pattern);
     J_cmu.reinit(sparsity_pattern);
@@ -101,13 +98,13 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     for(const auto& [dof_index, point] : dof_locations_map){
         double ri1 = sqrt(pow((point[0] - x1c1),2) + pow((point[1] - x2c1),2));
         double ri2 = sqrt(pow((point[0] - x1c2),2) + pow((point[1] - x2c2),2));
-        double di1 = std::tanh((R1 - ri1)/sqrt(2*epsilon_*epsilon_));
-        double di2 = std::tanh((R2 - ri2)/sqrt(2*epsilon_*epsilon_));
+        double di1 = 0.5*(1 + std::tanh((R1 - ri1)/sqrt(2*epsilon_*epsilon_)));
+        double di2 = 0.5*(1 + std::tanh((R2 - ri2)/sqrt(2*epsilon_*epsilon_)));
         c(dof_index) = std::max(di1,di2);
     }
 
 
-    mu = 0.0;
+    mu = 0.0; //this will be initialised later in solver
 
     std::cout << "All global system matrices and vectors initialized" << std::endl;
 }

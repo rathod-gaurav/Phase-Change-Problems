@@ -60,6 +60,18 @@ void CahnHilliard<Nsd,BfOrder>::debug_system(){
     const double test5 = Mglobal.matrix_scalar_product(test_vector,fFuncVec) + (0.5*epsilon_*epsilon_)*Kglobal.matrix_scalar_product(c,c);
     std::cout << "total energy at current timestep : " << test5 << std::endl;
 
+    //check 6 to see if the sparsity pattern of monolithic jacobian required for Newton-Raphson is correctly initialized
+    bool check;
+    check = NR_jacobian.n_nonzero_elements() == 4*Mglobal.n_nonzero_elements();
+    if(check){
+        std::cout << "Sparsity Pattern for Newton Raphson monolithic Jacobian correctly initialised" << std::endl;
+    }
+    else{
+        std::cout << "Sparsity Pattern for Newton Raphson monolithic Jacobian NOT correctly initialised" << std::endl;
+    }
+
     std::cout << "------------------------" << std::endl;
+
+
 
 }
