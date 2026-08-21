@@ -47,8 +47,8 @@ int main(){
     unsigned int NT = 100; //number of timesteps to solve for
 
     //Conjugate Solver parameters
-    unsigned int NCG = 1000;
-    double epsilonCG = 1e-6;
+    unsigned int N_NR = 1000;
+    double epsilon_NR = 1e-6;
 
     unsigned int quadOrder = 2; //gaussian quadrature 
 
@@ -62,12 +62,13 @@ int main(){
     //bulk free energy function
     auto fFunc = [](double c){ return 0.25*pow((c*c - 1),2); };
     auto fFuncDerivative = [](double c){ return c*(c*c - 1); };
+    auto fFuncDoubleDerivative = [](double c){return 3*c*c - 1; };
 
     //domain and mesh parameters
     double x_ll = 0.0, x_ul = 1.0; //square domain for 2D, cube domain for 3D
 
     OutputWriter<Nsd,BfOrder> output_writer("output");
-    CahnHilliard<Nsd,BfOrder> problem(x_ll, x_ul, quadOrder, fFunc, fFuncDerivative, NT, Mobility, epsilon, dt, NCG, epsilonCG, output_writer);
+    CahnHilliard<Nsd,BfOrder> problem(x_ll, x_ul, quadOrder, fFunc, fFuncDerivative, fFuncDoubleDerivative, NT, Mobility, epsilon, dt, N_NR, epsilon_NR, output_writer);
     
     problem.run();
 }

@@ -4,7 +4,7 @@ template <unsigned int Nsd, unsigned int BfOrder>
 void CahnHilliard<Nsd,BfOrder>::setup_system(){
     dof_handler.distribute_dofs(fe);
     const unsigned int N = dof_handler.n_dofs();
-    
+
     std::cout << "Number of degrees of freedom: " << N << std::endl;
 
     DynamicSparsityPattern dsp(N);
@@ -15,6 +15,8 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     Kglobal.reinit(sparsity_pattern);
 
     Bglobal.reinit(N);
+    dBglobal_dc.reinit(sparsity_pattern);
+
     c.reinit(N);
     mu.reinit(N);
 
@@ -35,8 +37,8 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     for (unsigned int i = 0; i < N; ++i){
         for (unsigned int k = 0; k < dsp.row_length(i); ++k){
             const auto j = dsp.column_number(i, k);
-            jac_dsp.add(i,     j);
-            jac_dsp.add(i,     j + N);
+            jac_dsp.add(i, j);
+            jac_dsp.add(i, j + N);
             jac_dsp.add(i + N, j);
             jac_dsp.add(i + N, j + N);
         }
@@ -44,9 +46,18 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     jacobian_sparsity_pattern.copy_from(jac_dsp);
     NR_jacobian.reinit(jacobian_sparsity_pattern);
 
+    bool check;
+    check = NR_jacobian.n_nonzero_elements() == 4*Mglobal.n_nonzero_elements();
+    if(check){
+        std::cout << "Newton Raphson monolithic Jacobian correctly initialised" << std::endl;
+    }
+    else{
+        std::cout << "Newton Raphson monolithic Jacobian NOT correctly initialised" << std::endl;
+    }
+
     J_cc.reinit(sparsity_pattern);
     J_cmu.reinit(sparsity_pattern);
-    J_muc.reinit(sparsity_pattern);
+    J_muc.reinit(sparsity_pattern); J_muc_term1.reinit(sparsity_pattern);
     J_mumu.reinit(sparsity_pattern);
 
     //Initial conditions

@@ -17,11 +17,23 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
     Mglobal = 0.0;
     Kglobal = 0.0;
     assemble_system(); //assemble Mglobal and Kglobal only once - as they are constant matrices
-    
+
+    J_cc = 0.0; J_cmu = 0.0; J_muc = 0.0; J_muc_term1 = 0.0; J_mumu = 0.0;
+    J_cc = Mglobal;
+    J_cmu.add(dt_*Mobility_, Kglobal);
+    J_muc_term1.add(-1*epsilon_*epsilon_, Kglobal);
+    J_mumu = Mglobal;
+
     for(unsigned int timestep = 1 ; timestep < NT_ ; timestep++){
         Bglobal = 0.0;
+        dBglobal_dc = 0.0;
+        J_muc = J_muc_term1;
 
         assemble_system_B();
+
+        J_muc.add(-1.0, dBglobal_dc);
+
+        //NR loops
 
         // // RHS1 = Kglobal*(epsilon_*epsilon_)*c + Bglobal;
         Kglobal.vmult(RHS1,c);
