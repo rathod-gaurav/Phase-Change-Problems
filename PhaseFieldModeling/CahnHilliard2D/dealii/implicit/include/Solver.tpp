@@ -40,7 +40,7 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
     J_muc_term1.add(-1*epsilon_*epsilon_, Kglobal);
     J_mumu.copy_from(Mglobal);
 
-    std::cout << "Mglobal frobenius norm : " << Mglobal.frobenius_norm() << std::endl;
+    // std::cout << "Mglobal frobenius norm : " << Mglobal.frobenius_norm() << std::endl;
 
     //lambda function to copy these matrices into the system monolothic jacobian
     auto copy_block = [](const SparseMatrix<double>& child_matrix, const unsigned int row_offset, const unsigned int col_offset, SparseMatrix<double>& result_matrix){
@@ -123,30 +123,30 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
                 //Jacobian
                 J_muc.add(-1.0, dBglobal_dc);
 
-                std::cout << "J_cc jacobian Frobenius norm : " << J_cc.frobenius_norm() << std::endl;
-                std::cout << "J_cmu jacobian Frobenius norm : " << J_cmu.frobenius_norm() << std::endl;
-                std::cout << "J_muc jacobian Frobenius norm : " << J_muc.frobenius_norm() << std::endl;
-                std::cout << "J_mumu jacobian Frobenius norm : " << J_mumu.frobenius_norm() << std::endl;
+                // std::cout << "J_cc jacobian Frobenius norm : " << J_cc.frobenius_norm() << std::endl;
+                // std::cout << "J_cmu jacobian Frobenius norm : " << J_cmu.frobenius_norm() << std::endl;
+                // std::cout << "J_muc jacobian Frobenius norm : " << J_muc.frobenius_norm() << std::endl;
+                // std::cout << "J_mumu jacobian Frobenius norm : " << J_mumu.frobenius_norm() << std::endl;
 
                 zero_block(J_muc, N, 0, NR_jacobian);
                 copy_block(J_muc, N, 0, NR_jacobian);
 
-                std::cout << "NR jacobian Frobenius norm : " << NR_jacobian.frobenius_norm() << std::endl;
+                // std::cout << "NR jacobian Frobenius norm : " << NR_jacobian.frobenius_norm() << std::endl;
 
                 //Solve
                 SparseDirectUMFPACK directsolver;
                 directsolver.initialize(NR_jacobian);
                 directsolver.vmult(NR_update, NR_residual);
 
-                std::cout << "NR update L2 norm : " << NR_update.l2_norm() << std::endl;
+                // std::cout << "NR update L2 norm : " << NR_update.l2_norm() << std::endl;
 
                 for(unsigned int i = 0 ; i < N ; i++){
                     c_k(i) += NR_update(i);
                     mu_k(i) += NR_update(i + N);
                 }
 
-                std::cout << "c_k l2 norm : " << c_k.l2_norm() << std::endl;
-                std::cout << "mu_k l2 norm : " << mu_k.l2_norm() << std::endl;
+                // std::cout << "c_k l2 norm : " << c_k.l2_norm() << std::endl;
+                // std::cout << "mu_k l2 norm : " << mu_k.l2_norm() << std::endl;
             }
         }
         
