@@ -76,7 +76,7 @@ void CahnHilliard<Nsd,BfOrder>::solve(){
 
             Bglobal = 0.0;
             dBglobal_dc = 0.0;
-            J_muc = J_muc_term1;
+            J_muc.copy_from(J_muc_term1);
 
             assemble_system_B(); //it uses c_k //calculates Bglobal and dBglobal_dc
 
