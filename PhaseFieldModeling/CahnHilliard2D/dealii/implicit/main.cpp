@@ -44,7 +44,7 @@ int main(){
     constexpr unsigned int Nsd = 2; //2 for 2D problem, 3 for 3D problem
     constexpr unsigned int BfOrder = 1; //1 for linear elements, 2 for quadratic
 
-    unsigned int NT = 100; //number of timesteps to solve for
+    unsigned int NT = 5000; //number of timesteps to solve for
 
     //Conjugate Solver parameters
     unsigned int N_NR = 10; //maximum number of iterations for newton-raphson
@@ -58,7 +58,7 @@ int main(){
 
     //assumptions
     double epsilon = 0.1;
-    double dt = 5*1e-6;
+    double dt = 1e-5;
 
     //bulk free energy function
     // auto fFunc = [](double c){ return 0.25*pow((c*c - 1),2); };
