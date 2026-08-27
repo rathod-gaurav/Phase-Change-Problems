@@ -3,7 +3,7 @@
 #include "ComputeElement.tpp"
 
 template <unsigned int Nsd, unsigned int BfOrder>
-void CahnHilliard<Nsd,BfOrder>::assemble_system(){
+void AllenCahn<Nsd,BfOrder>::assemble_system(){
     const QGauss<Nsd> quadrature_formula(quadOrder_);
 
     // the following class handles three things at once - finite element(basis functions), quadrature, and mapping from parent to real domains

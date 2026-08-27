@@ -1,4 +1,4 @@
-//Implicit Cahn-Hilliard - DealII
+//Implicit Allen-Cahn - DealII
 
 #include <deal.II/grid/tria.h> //triangulation
 #include <deal.II/dofs/dof_handler.h> //enumeration of degrees of freedom
@@ -37,7 +37,7 @@
 
 using namespace dealii;
 
-#include <CahnHilliard.hpp>
+#include <AllenCahn.hpp>
 #include <OutputWriter.hpp>
 
 int main(){
@@ -49,7 +49,6 @@ int main(){
     //Conjugate Solver parameters
     unsigned int N_NR = 10; //maximum number of iterations for newton-raphson
     double epsilon_NR = 1e-6;
-    double theta = 0.5; //1 for fully implicit
 
     unsigned int quadOrder = 2; //gaussian quadrature 
 
@@ -61,19 +60,19 @@ int main(){
     double dt = 1e-5;
 
     //bulk free energy function
-    // auto fFunc = [](double c){ return 0.25*pow((c*c - 1),2); };
-    // auto fFuncDerivative = [](double c){ return c*(c*c - 1); };
-    // auto fFuncDoubleDerivative = [](double c){return 3*c*c - 1; };
+    auto fFunc = [](double c){ return 0.25*pow((c*c - 1),2); };
+    auto fFuncDerivative = [](double c){ return c*(c*c - 1); };
+    auto fFuncDoubleDerivative = [](double c){return 3*c*c - 1; };
 
-    auto fFunc = [](double c){ return 100*c*c*(1-c)*(1-c); };
-    auto fFuncDerivative = [](double c){ return 200*c*(1-c)*(1-2*c); };
-    auto fFuncDoubleDerivative = [](double c){return 200*(6*c*c - 6*c + 1); };
+    // auto fFunc = [](double c){ return 100*c*c*(1-c)*(1-c); };
+    // auto fFuncDerivative = [](double c){ return 200*c*(1-c)*(1-2*c); };
+    // auto fFuncDoubleDerivative = [](double c){return 200*(6*c*c - 6*c + 1); };
 
     //domain and mesh parameters
     double x_ll = 0.0, x_ul = 1.0; //square domain for 2D, cube domain for 3D
 
     OutputWriter<Nsd,BfOrder> output_writer("output");
-    CahnHilliard<Nsd,BfOrder> problem(x_ll, x_ul, quadOrder, fFunc, fFuncDerivative, fFuncDoubleDerivative, NT, Mobility, epsilon, dt, N_NR, epsilon_NR, theta, output_writer);
+    AllenCahn<Nsd,BfOrder> problem(x_ll, x_ul, quadOrder, fFunc, fFuncDerivative, fFuncDoubleDerivative, NT, Mobility, epsilon, dt, N_NR, epsilon_NR, output_writer);
     
     problem.run();
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 template <unsigned int Nsd, unsigned int BfOrder>
-void CahnHilliard<Nsd,BfOrder>::setup_system(){
+void AllenCahn<Nsd,BfOrder>::setup_system(){
     dof_handler.distribute_dofs(fe);
     N = dof_handler.n_dofs();
 
@@ -15,56 +15,28 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     Kglobal.reinit(sparsity_pattern);
 
     Bglobal.reinit(N);
-    dBglobal_dc.reinit(sparsity_pattern);
+    dBglobal_dphi.reinit(sparsity_pattern);
 
-    c.reinit(N);
-    mu.reinit(N);
+    phi.reinit(N);
 
-    c_k.reinit(N);
-    mu_k.reinit(N);
+    phi_k.reinit(N);
 
-    c_np1.reinit(N);
-    mu_np1.reinit(N);
+    NR_update.reinit(N);
+    NR_residual.reinit(N);
+    
+    NR_jacobian.reinit(sparsity_pattern);
+    jacobian_term1.reinit(sparsity_pattern);
 
-    delta_c.reinit(N);
-    delta_mu.reinit(N);
-
-    RHS1.reinit(N);
-    RHS2.reinit(N);
-    RHS2_.reinit(N);
-
-    NR_update.reinit(2*N);
-    NR_residual.reinit(2*N);    
-
-    G_c.reinit(N);
-    G_mu.reinit(N);
-
-    DynamicSparsityPattern jac_dsp(2 * N);
-    for (unsigned int i = 0; i < N; i++){
-        for (unsigned int k = 0; k < dsp.row_length(i); ++k){
-            const auto j = dsp.column_number(i, k);
-            jac_dsp.add(i, j);
-            jac_dsp.add(i, j + N);
-            jac_dsp.add(i + N, j);
-            jac_dsp.add(i + N, j + N);
-        }
-    }
-    jacobian_sparsity_pattern.copy_from(jac_dsp);
-    NR_jacobian.reinit(jacobian_sparsity_pattern);
-
-    J_cc.reinit(sparsity_pattern);
-    J_cmu.reinit(sparsity_pattern);
-    J_muc.reinit(sparsity_pattern); J_muc_term1.reinit(sparsity_pattern);
-    J_mumu.reinit(sparsity_pattern);
+    G_phi.reinit(N);
 
     //Initial conditions
-    c = 0.0;
+    phi = 0.0;
     //random noise initial condition //results stored in output 2
     // // std::random_device rd;
     std::default_random_engine gen(123);
     std::uniform_real_distribution<double> dist(0.0, 1.0);
     for(unsigned int i = 0 ; i < N; i++){
-        c(i) = 0.63 + 0.02*(0.5 - dist(gen));
+        phi(i) = 0.63 + 0.02*(0.5 - dist(gen));
     }
 
     
@@ -102,9 +74,6 @@ void CahnHilliard<Nsd,BfOrder>::setup_system(){
     //     double di2 = 0.5*(1 + std::tanh((R2 - ri2)/sqrt(2*epsilon_*epsilon_)));
     //     c(dof_index) = std::max(di1,di2);
     // }
-
-
-    mu = 0.0; //this will be initialised later in solver
 
     std::cout << "All global system matrices and vectors initialized" << std::endl;
 }

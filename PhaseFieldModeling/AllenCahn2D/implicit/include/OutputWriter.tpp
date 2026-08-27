@@ -8,11 +8,10 @@ OutputWriter<Nsd,BfOrder>::OutputWriter(const std::string& output_dir)
 }
 
 template <unsigned int Nsd, unsigned int BfOrder>
-void OutputWriter<Nsd,BfOrder>::write_vtu_and_pvd(DoFHandler<Nsd>& dof_handler, Vector<double>& solution1, Vector<double>& solution2, const unsigned int timestep, std::ofstream &pvd_output){
+void OutputWriter<Nsd,BfOrder>::write_vtu_and_pvd(DoFHandler<Nsd>& dof_handler, Vector<double>& solution1, const unsigned int timestep, std::ofstream &pvd_output){
     DataOut<Nsd> data_out;
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution1, "concentration");
-    data_out.add_data_vector(solution2, "chemical_potential");
+    data_out.add_data_vector(solution1, "phi");
 
     data_out.build_patches();
 
