@@ -34,26 +34,26 @@ void AllenCahn<Nsd,BfOrder>::setup_system(){
     //Initial conditions
     phi = 0.0;
     //vertical separation initial condition
-    for(const auto& [dof_index,point] : dof_locations_map){
-        if(point[0] <= 0.5){ phi(dof_index) = 1.0; }
-        else{ phi(dof_index) = -1.0; }
-    }
+    // for(const auto& [dof_index,point] : dof_locations_map){
+    //     if(point[0] <= 0.5){ phi(dof_index) = 1.0; }
+    //     else{ phi(dof_index) = -1.0; }
+    // }
     
 
     //circular droplet initial condition
-    // const double x1c = 0.5*x_ul_;
-    // const double x2c = 0.5*x_ul_;
-    // const double R = 0.25*x_ul_;
+    const double x1c = 0.5*x_ul_;
+    const double x2c = 0.5*x_ul_;
+    const double R = 0.45*x_ul_;
 
-    // for(const auto& [dof_index, point] : dof_locations_map){
-    //     double ri = sqrt(pow((point[0] - x1c),2) + pow((point[1] - x2c),2));
-    //     if(ri <= R){
-    //         phi(dof_index) = 1.0;
-    //     }
-    //     else{
-    //         phi(dof_index) = -1.0;
-    //     }
-    // }
+    for(const auto& [dof_index, point] : dof_locations_map){
+        double ri = sqrt(pow((point[0] - x1c),2) + pow((point[1] - x2c),2));
+        if(ri <= R){
+            phi(dof_index) = 1.0;
+        }
+        else{
+            phi(dof_index) = -1.0;
+        }
+    }
 
     std::cout << "All global system matrices and vectors initialized" << std::endl;
 }
