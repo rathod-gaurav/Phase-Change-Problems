@@ -29,7 +29,7 @@ void AllenCahn<Nsd,BfOrder>::setup_system(){
 
     G_phi.reinit(N);
     
-    const std::map<types::global_dof_index, Point<2>> dof_locations_map = DoFTools::map_dofs_to_support_points(MappingQ1<2>(), dof_handler);
+    const std::map<types::global_dof_index, Point<Nsd>> dof_locations_map = DoFTools::map_dofs_to_support_points(MappingQ1<Nsd>(), dof_handler);
 
     //Initial conditions
     phi = 0.0;
